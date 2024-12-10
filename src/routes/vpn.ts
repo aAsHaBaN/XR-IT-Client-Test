@@ -7,12 +7,12 @@ const router = Router();
 
 router.post('/vpn', async (req: Request, res: Response, next: NextFunction) => {
 
-    //const vpnData: SoftEtherClient = req.body.vpn;
-    const script_path = build_path("/src/ConnectClient.ps1");
-    const scriptResponce= await runPowershell(script_path, []);
-    //const response = await createVPNSetting(vpnData)
+    const vpnData: SoftEtherClient = req.body.vpn;
+    //const script_path = build_path("/src/ConnectClient.ps1");
+    //const scriptResponce= await runPowershell(script_path, []);
+    const response = await createVPNSetting(vpnData)
 
-    res.status(200).json(scriptResponce);//.send('VPN Settigns created successfully');
+    res.status(200).json(response);//.send('VPN Settigns created successfully');
 })
 
 router.delete('/vpn', async (req: Request, res: Response, next: NextFunction) => {
