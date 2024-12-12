@@ -1,0 +1,24 @@
+version: '4'
+
+services:
+  node-frontend:
+    build:
+      context: ./node-frontend
+      dockerfile: Dockerfile
+    container_name: client-frontend
+    ports:
+      - "3001:3000" # Map frontend to port 3001
+    environment:
+      - NODE_BACKEND_URL=http://<HOST_IP>:2223 # Use the host's IP address
+    depends_on:
+      - node-backend
+
+  node-backend:
+    build:
+      context: ./node-backend
+      dockerfile: Dockerfile
+    container_name: client-backend
+    network_mode: host # Use the host's network stack
+    restart: always
+    environment:
+      - NODE_ENV=production

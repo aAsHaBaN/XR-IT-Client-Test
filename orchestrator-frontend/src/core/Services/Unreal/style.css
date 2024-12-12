@@ -1,0 +1,15 @@
+@tailwind components;
+
+@layer components {
+  .unreal-node .custom-node__header {
+    @apply bg-unreal-primary;
+  }
+
+  .unreal-subnode {
+    @apply h-8 w-36;
+  }
+
+  .subnode.unreal-subnode {
+    @apply bg-unreal-primary/50;
+  }
+}

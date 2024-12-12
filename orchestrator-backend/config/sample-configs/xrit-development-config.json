@@ -1,0 +1,272 @@
+{
+    "id": "8bfa88c3-6a34-4ca6-a229-ccc66fde82a6",
+    "configuration_name": "XRIT Development Config",
+    "vpn": {
+        "public_ip": "192.87.95.201",
+        "local_ip": "192.168.20.1",
+        "subnet": "255.255.255.0",
+        "admin": {
+            "name": "admin",
+            "pw": "0perationC0re404"
+        },
+        "virtual_hub": {
+            "name": "XRIT",
+            "pw": "test",
+            "port": 5555
+        },
+        "is_online": false
+    },
+    "labs": [
+        {
+            "id": "b4972f36-3fb2-4905-87cc-55dc8caa11a9",
+            "name": "TRL-VLAB1",
+            "lab_permissions": [
+                "24a94d66-7a55-4536-8684-0e541a60773f",
+                "f57a7830-5c2c-4a74-b578-49a72c81e9b7"
+            ]
+        },
+        {
+            "id": "24a94d66-7a55-4536-8684-0e541a60773f",
+            "name": "TRL-VLAB2",
+            "lab_permissions": []
+        },
+        {
+            "id": "f57a7830-5c2c-4a74-b578-49a72c81e9b7",
+            "name": "TRL-VLAB3",
+            "lab_permissions": []
+        }
+    ],
+    "nodes": [
+        {
+            "id": "d38018b8-8e53-4eaa-be98-2aac5820922a",
+            "lab_id": "b4972f36-3fb2-4905-87cc-55dc8caa11a9",
+            "machine_alias": "DAE-Orchestrator",
+            "local_ip": "192.168.20.1",
+            "configurations": [],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "orchestrator"
+        },
+        {
+            "id": "6925669e-043e-4654-af79-d36c8518ee43",
+            "lab_id": "24a94d66-7a55-4536-8684-0e541a60773f",
+            "machine_alias": "DAE-One",
+            "local_ip": "192.168.20.220",
+            "configurations": [
+                {
+                    "id": "d3c9d27d-caa0-4c7c-9759-47565c32b2f0",
+                    "software_id": "MVN",
+                    "settings": {
+                        "hardware": [
+                            {
+                                "id": "4740e255-674b-4402-a36b-9c4e9767e0f6",
+                                "hardware_id": "XSENS_SUIT"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "client"
+        },
+        {
+            "id": "54029d58-1998-4ac1-ac53-0d5f3ef0a1cb",
+            "lab_id": "f57a7830-5c2c-4a74-b578-49a72c81e9b7",
+            "machine_alias": "DAE-Two",
+            "local_ip": "192.168.20.221",
+            "configurations": [
+                {
+                    "id": "fcf005f0-9458-4abd-bcdb-56b86b281d49",
+                    "software_id": "MVN",
+                    "settings": {
+                        "hardware": [
+                            {
+                                "id": "39125b3c-8f87-4873-acda-68969b569a52",
+                                "hardware_id": "XSENS_SUIT"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "client"
+        },
+        {
+            "id": "f2690fd1-3f31-4727-a8df-b2fc86945209",
+            "lab_id": "b4972f36-3fb2-4905-87cc-55dc8caa11a9",
+            "machine_alias": "DAE-Three",
+            "local_ip": "192.168.20.249",
+            "configurations": [
+                {
+                    "id": "1e933b4b-0542-4995-a456-de987d9069bf",
+                    "software_id": "UNREAL_ENGINE",
+                    "settings": {
+                        "udp_unicast_endpoint": {
+                            "url": "127.0.0.1",
+                            "port": 0
+                        },
+                        "livelink": {
+                            "sources": [
+                                {
+                                    "$type": "xrit_unreal::LiveLinkMvnSource",
+                                    "id": "943c96e1-0da6-4b57-8b5e-650688bc4c92",
+                                    "settings": {
+                                        "port": 8764
+                                    }
+                                },
+                                {
+                                    "$type": "xrit_unreal::LiveLinkOptitrackSource",
+                                    "id": "1b6967c6-bdf7-46bd-8ac2-6250a6c52b80",
+                                    "settings": {
+                                        "server_address": "192.168.20.250",
+                                        "client_address": "192.168.20.249",
+                                        "is_Multicast": false
+                                    }
+                                },
+                                {
+                                    "$type": "xrit_unreal::LiveLinkMvnSource",
+                                    "id": "0cb0785e-49d1-46c1-a87b-5335c47af021",
+                                    "settings": {
+                                        "port": 8766
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "client"
+        },
+        {
+            "id": "da300860-19da-46c1-9bff-b98d6f6dba42",
+            "lab_id": "f57a7830-5c2c-4a74-b578-49a72c81e9b7",
+            "machine_alias": "DAE-Four",
+            "local_ip": "192.168.20.250",
+            "configurations": [
+                {
+                    "id": "a9d4b1bb-71a7-48c1-929b-fe279e64defe",
+                    "software_id": "OPTITRACK",
+                    "settings": {
+                        "hardware": [
+                            {
+                                "id": "26f63b57-e5e6-470d-a617-46e039d20356",
+                                "hardware_id": "OPTITRACK_SUIT"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "client"
+        },
+        {
+            "id": "10556115-1bd3-48b3-a366-d1a6ae0d5cad",
+            "lab_id": "24a94d66-7a55-4536-8684-0e541a60773f",
+            "machine_alias": "DAE-Five",
+            "local_ip": "192.168.20.224",
+            "configurations": [
+                {
+                    "id": "24a94d66-7a55-4536-8684-0e541a60773f",
+                    "software_id": "METAQUEST",
+                    "settings": {
+                        "isHeadsetConnected": false
+                    }
+                }
+            ],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "client"
+        },
+        {
+            "id": "64baeb74-1b48-4c44-868b-ff13cd5435b2",
+            "lab_id": "24a94d66-7a55-4536-8684-0e541a60773f",
+            "machine_alias": "DAE-Six",
+            "local_ip": "192.168.20.225",
+            "configurations": [
+                {
+                    "id": "428d0871-af6b-4c5a-969c-bd7477af754d",
+                    "software_id": "ULTRAGRID_SEND",
+                    "settings": {
+                        "video": {},
+                        "audio": {}
+                    }
+                }
+            ],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "client"
+        },
+        {
+            "id": "f3a7a69d-57ca-4e65-ab23-c98f6d2f3450",
+            "lab_id": "b4972f36-3fb2-4905-87cc-55dc8caa11a9",
+            "machine_alias": "DAE-Seven",
+            "local_ip": "192.168.20.226",
+            "configurations": [
+                {
+                    "id": "d1ecce1e-bd25-44af-bc8d-f48f86d4cf03",
+                    "software_id": "ULTRAGRID_RECEIVE",
+                    "settings": {}
+                }
+            ],
+            "av_inputs": [],
+            "av_outputs": [],
+            "role": "client"
+        }
+    ],
+    "streams": [
+        {
+            "id": "943c96e1-0da6-4b57-8b5e-650688bc4c92",
+            "source": {
+                "node_id": "6925669e-043e-4654-af79-d36c8518ee43",
+                "configuration_id": "d3c9d27d-caa0-4c7c-9759-47565c32b2f0"
+            },
+            "target": {
+                "node_id": "f2690fd1-3f31-4727-a8df-b2fc86945209",
+                "configuration_id": "1e933b4b-0542-4995-a456-de987d9069bf",
+                "entry_point": {
+                    "type": "PORT",
+                    "value": 8764
+                }
+            },
+            "settings": {}
+        },
+        {
+            "id": "1b6967c6-bdf7-46bd-8ac2-6250a6c52b80",
+            "source": {
+                "node_id": "da300860-19da-46c1-9bff-b98d6f6dba42",
+                "configuration_id": "a9d4b1bb-71a7-48c1-929b-fe279e64defe"
+            },
+            "target": {
+                "node_id": "f2690fd1-3f31-4727-a8df-b2fc86945209",
+                "configuration_id": "1e933b4b-0542-4995-a456-de987d9069bf",
+                "entry_point": {
+                    "type": "PORT",
+                    "value": 8765
+                }
+            },
+            "settings": {}
+        },
+        {
+            "id": "0cb0785e-49d1-46c1-a87b-5335c47af021",
+            "source": {
+                "node_id": "6925669e-043e-4654-af79-d36c8518ee43",
+                "configuration_id": "d3c9d27d-caa0-4c7c-9759-47565c32b2f0"
+            },
+            "target": {
+                "node_id": "f2690fd1-3f31-4727-a8df-b2fc86945209",
+                "configuration_id": "1e933b4b-0542-4995-a456-de987d9069bf",
+                "entry_point": {
+                    "type": "PORT",
+                    "value": 8766
+                }
+            },
+            "settings": {}
+        }
+    ],
+    "errors": []
+}

@@ -1,0 +1,7 @@
+.configuration-flow.react-flow .react-flow__edges {
+  z-index: 10000;
+}
+
+.react-flow__edge.animated path {
+  animation-duration: 0.8s;
+}

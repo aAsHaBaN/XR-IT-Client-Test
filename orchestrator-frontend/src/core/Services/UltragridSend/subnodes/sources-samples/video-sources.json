@@ -1,0 +1,57 @@
+{
+  "SDI & HDMI": [
+    { "label": "Aja", "value": "Aja" },
+    {
+      "label": "Decklink SDI 8k Pro (1)",
+      "value": "Decklink SDI 8k Pro (1)"
+    },
+    {
+      "label": "Decklink SDI 8k Pro (2)",
+      "value": "Decklink SDI 8k Pro (2)"
+    }
+  ],
+  "NDI": [
+    {
+      "label": "BARTS-PC (HP HD Camera)",
+      "value": "BARTS-PC (HP HD Camera)"
+    },
+    {
+      "label": "BARTS-PC (Intel UHD Graphics 630 1)",
+      "value": "BARTS-PC (Intel UHD Graphics 630 1)"
+    }
+  ],
+  "PC Screen": [
+    {
+      "label": "Screen 1",
+      "value": "Screen 1"
+    },
+    {
+      "label": "Screen 2",
+      "value": "Screen 2"
+    },
+    {
+      "label": "Spout",
+      "value": "Spout"
+    }
+  ],
+  "Test signal": [
+    {
+      "label": "Test signal",
+      "value": "Test signal"
+    }
+  ],
+  "Other": [
+    {
+      "label": "HP HD Webcam",
+      "value": "HP HD Webcam"
+    },
+    {
+      "label": "OBS Virtual Camera",
+      "value": "OBS Virtual Camera"
+    },
+    {
+      "label": "Logitech BRIO 4K",
+      "value": "Logitech BRIO 4K"
+    }
+  ]
+}

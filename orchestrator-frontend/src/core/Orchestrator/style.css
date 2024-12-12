@@ -1,0 +1,7 @@
+@tailwind components;
+
+@layer components {
+  .orchestrator-node {
+    @apply bg-orchestrator text-white;
+  }
+}

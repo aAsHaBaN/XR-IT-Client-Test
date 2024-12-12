@@ -1,0 +1,7 @@
+[
+  { "label": "16 Kbps", "value": "16" },
+  { "label": "32 Kbps", "value": "32" },
+  { "label": "64 Kbps", "value": "64" },
+  { "label": "128 Kbps", "value": "128" },
+  { "label": "256 Kbps", "value": "256" }
+]

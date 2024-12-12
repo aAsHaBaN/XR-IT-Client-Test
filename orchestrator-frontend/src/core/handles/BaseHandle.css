@@ -1,0 +1,27 @@
+@tailwind components;
+
+@layer components {
+  .base-handle {
+    @apply relative top-0 mt-1 flex h-4 w-4 transform-none items-center rounded-full;
+  }
+
+  .base-handle .react-flow__handle {
+    @apply left-0 top-0 h-full w-full transform-none border-2 border-black;
+  }
+
+  .base-handle .react-flow__handle.connectingto {
+    @apply bg-red-500;
+  }
+
+  .base-handle .react-flow__handle.valid {
+    @apply bg-green-300;
+  }
+
+  .base-handle__icon {
+    @apply pointer-events-none absolute left-0.5 top-0.5 size-3 stroke-2;
+  }
+
+  .base-handle__error {
+    @apply absolute -left-2 -top-2;
+  }
+}

@@ -1,0 +1,102 @@
+[
+    {
+        "id": "6925669e-043e-4654-af79-d36c8518ee43",
+        "name": "MVN - Test Configuration",
+        "vpn": {
+            "name": "XRIT",
+            "ip": "10.10.10.1",
+            "port": 5555,
+            "username": "damika",
+            "password": "test",
+            "vpn": {
+                "ip": "192.168.20.230",
+                "name": "VPN20",
+                "subnet": "255.255.255.0"
+            }
+        },
+        "orchestrator_socket": {
+            "ip": "localhost",
+            "port": 1194
+        }
+    },
+    {
+        "id": "da300860-19da-46c1-9bff-b98d6f6dba42",
+        "name": "OptiTrack - Test Configuration",
+        "vpn": {
+            "name": "XRIT",
+            "ip": "192.87.95.201",
+            "port": 5555,
+            "username": "damika",
+            "password": "test",
+            "adapter": {
+                "ip": "192.168.20.250",
+                "name": "VPN20",
+                "subnet": "255.255.255.0"
+            }
+        },
+        "orchestrator_socket": {
+            "ip": "localhost",
+            "port": 1194
+        }
+    },
+    {
+        "id": "f2690fd1-3f31-4727-a8df-b2fc86945209",
+        "name": "Unreal Engine - Test Configuration",
+        "vpn": {
+            "name": "XRIT",
+            "ip": "192.87.95.201",
+            "port": 5555,
+            "username": "damika",
+            "password": "test",
+            "adapter": {
+                "ip": "192.168.20.249",
+                "name": "VPN20",
+                "subnet": "255.255.255.0"
+            }
+        },
+        "orchestrator_socket": {
+            "ip": "localhost",
+            "port": 1194
+        }
+    },
+    {
+        "id": "64baeb74-1b48-4c44-868b-ff13cd5435b2",
+        "name": "Ultra Grid Send - Test Configuration",
+        "vpn": {
+            "name": "XRIT",
+            "ip": "192.87.95.201",
+            "port": 5555,
+            "username": "damika",
+            "password": "test",
+            "adapter": {
+                "ip": "192.168.20.225",
+                "name": "VPN20",
+                "subnet": "255.255.255.0"
+            }
+        },
+        "orchestrator_socket": {
+            "ip": "localhost",
+            "port": 1194
+        }
+    },
+    {
+        "id": "f3a7a69d-57ca-4e65-ab23-c98f6d2f3450",
+        "name": "Ultra Grid Receive - Test Configuration",
+        "vpn": {
+            "name": "XRIT",
+            "ip": "192.87.95.201",
+            "port": 5555,
+            "username": "damika",
+            "password": "test",
+            "adapter": {
+                "ip": "192.168.20.226",
+                "name": "VPN20",
+                "subnet": "255.255.255.0"
+            }
+        },
+        "orchestrator_socket": {
+            "ip": "localhost",
+            "port": 1194
+        }
+    }
+]

@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "nodes.css";
+@import "handles.css";
+@import "edges.css";
+
+@layer base {
+  .sidebar {
+    height: calc(100% - 3.5rem);
+  }
+}

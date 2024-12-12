@@ -1,0 +1,12 @@
+# Environment files
+.env
+.env.*
+# Includes .env.local, .env.production, etc.
+
+# Local files and configurations
+.DS_Store
+*.swp
+*.swo
+.vscode
+.idea
+*.iml
