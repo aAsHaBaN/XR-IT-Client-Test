@@ -28,7 +28,7 @@ fi
 
 # Clone or pull the main repository
 echo -e "${GREEN}Pulling the project repository...${NC}"
-REPO_URL="<YOUR_PUBLIC_REPO_URL>" # Replace this with your public repo URL
+REPO_URL="https://github.com/aAsHaBaN/XR-IT-Client-Test.git" # Replace this with your public repo URL
 PROJECT_DIR="xr-it-client"
 
 if [ ! -d "$PROJECT_DIR" ]; then
