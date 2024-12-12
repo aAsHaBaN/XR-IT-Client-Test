@@ -7,8 +7,13 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+if [ "$EUID" -ne 0 ]; then
+  echo -e "${RED}Please run this script as root or with sudo.${NC}"
+  exit 1
+fi
+
 # Wait if encountered an error
-trap "echo -e '${RED}Script encountered an error.${NC} Press Enter to close...'; read" ERR
+trap "echo -e '${RED}Script encountered an error.${NC}'; kill $NODE_MIDDLEMAN_APP_PID 2>/dev/null; read -p 'Press Enter to close...'; exit 1" ERR
 
 BASE_DIR=$(dirname "$0")
 cd "$BASE_DIR"
@@ -28,7 +33,7 @@ fi
 
 # Clone or pull the main repository
 echo -e "${GREEN}Pulling the project repository...${NC}"
-REPO_URL="https://github.com/aAsHaBaN/XR-IT-Client-Test.git" # Replace this with your public repo URL
+REPO_URL="https://github.com/aAsHaBaN/XR-IT-Client-Test.git"
 PROJECT_DIR="xr-it-client"
 
 if [ ! -d "$PROJECT_DIR" ]; then
@@ -37,29 +42,40 @@ if [ ! -d "$PROJECT_DIR" ]; then
 else
   echo -e "${GREEN}Repository already exists. Pulling the latest changes...${NC}"
   cd "$PROJECT_DIR"
-  git reset --hard HEAD  # Reset any local changes to avoid conflicts
-  git pull origin main   # Replace 'main' with your default branch if different
+  git reset --hard HEAD
+  git pull origin main
   cd "$BASE_DIR"
 fi
 
 cd "$PROJECT_DIR"
 
-# Start the mock-express-app
-MOCK_EXPRESS_APP_DIR="mock-client-middleman"
-C_SHARP_PORT=8080
+# Fix line ending issues in the repository
+echo -e "${GREEN}Fixing line ending issues...${NC}"
+git config --global core.autocrlf input
+git rm --cached -r .
+git reset --hard HEAD
 
-if [ -d "$MOCK_EXPRESS_APP_DIR" ]; then
-  echo -e "${GREEN}Starting the mock-express-app...${NC}"
-  cd "$MOCK_EXPRESS_APP_DIR"
-  npm install  # Install dependencies
+# Start the node-middleman app
+NODE_MIDDLEMAN_APP_DIR="node-middleman"
+NODE_MIDDLEMAN_PORT=2224
+
+pkill -f "node-middleman" 2>/dev/null || true  # Stop any existing instance
+
+if [ -d "$NODE_MIDDLEMAN_APP_DIR" ]; then
+  echo -e "${GREEN}Starting the node-middleman...${NC}"
+  cd "$NODE_MIDDLEMAN_APP_DIR"
+
+  echo -e "${GREEN}Fixing npm issues...${NC}"
+  npm install npm -g
+  npm install > npm-install.log 2>&1
+
+  echo -e "${GREEN}Building and starting the application...${NC}"
   npm start &  # Start the application in the background
-  # START WITH PRIVILLEGED RIGHTS
-  # git config --global core.autocrlf input ENTRYPOINT FIX
-  # npm i fails
-  MOCK_APP_PID=$!
+  NODE_MIDDLEMAN_APP_PID=$!
+
   cd "$BASE_DIR/$PROJECT_DIR"
 else
-  echo -e "${RED}mock-express-app directory not found. Exiting.${NC}"
+  echo -e "${RED}node-middleman directory not found. Exiting.${NC}"
   exit 1
 fi
 
@@ -67,23 +83,20 @@ fi
 echo -e "${GREEN}Launching Docker containers...${NC}"
 DOCKER_COMPOSE_FILE="docker-compose-client.yml"
 if [ -f "$DOCKER_COMPOSE_FILE" ]; then
-  if ! docker-compose -f "$DOCKER_COMPOSE_FILE" up --build -d; then
-    echo -e "${RED}Error: Docker Compose failed to start.${NC}"
-    kill $MOCK_APP_PID
-    exit 1
-  fi
+  docker-compose -f "$DOCKER_COMPOSE_FILE" up --build -d > docker-compose.log 2>&1
 else
   echo -e "${RED}Docker Compose file not found: $DOCKER_COMPOSE_FILE.${NC}"
-  kill $MOCK_APP_PID
+  kill $NODE_MIDDLEMAN_APP_PID
+  read -p "Press Enter to close..."
   exit 1
 fi
 
-
 # Verify setup
 echo -e "${GREEN}Verifying setup...${NC}"
-if ! curl -s http://localhost:$C_SHARP_PORT/ > /dev/null; then
-  echo -e "${RED}mock-express-app failed to start.${NC}"
-  kill $MOCK_APP_PID
+if ! curl -m 10 -s http://localhost:$NODE_MIDDLEMAN_PORT/ > /dev/null; then
+  echo -e "${RED}node-middleman failed to start within timeout.${NC}"
+  kill $NODE_MIDDLEMAN_APP_PID
+  read -p "Press Enter to close..."
   exit 1
 fi
 

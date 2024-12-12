@@ -32,7 +32,7 @@ export class NodeService {
   }
 
   // Call the middleman API (Express moock app)
-  private expressBaseUrl = 'http://host.docker.internal:8080';
+  private expressBaseUrl = 'http://host.docker.internal:2224';
 
   private async createVPNSetting(vpn: SoftEtherClient) {
     try {
