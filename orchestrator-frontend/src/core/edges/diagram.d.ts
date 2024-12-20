@@ -1,12 +1,13 @@
 import {
-  CUSTOM_EDGE,
+  EXTERNAL_EDGE,
   ERROR_EDGE,
   OFFLINE_EDGE,
   PENDING_EDGE,
 } from "./constants";
 
 export const edgeTypes = [
-  CUSTOM_EDGE,
+  EXTERNAL_EDGE,
+  INTERNAL_EDGE,
   PENDING_EDGE,
   ERROR_EDGE,
   OFFLINE_EDGE,

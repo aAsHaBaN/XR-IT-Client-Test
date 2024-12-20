@@ -4,7 +4,7 @@
   .custom-edge {
     @apply stroke-lime-600 stroke-2;
   }
-  .react-flow__edge.selected .react-flow__edge-path.custom-edge--selected {
+  .react-flow__edge.selected .react-flow__edge-path.external-edge--selected {
     @apply stroke-teal-600 stroke-[3px];
   }
 

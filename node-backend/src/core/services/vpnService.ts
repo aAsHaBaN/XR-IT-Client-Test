@@ -1,6 +1,6 @@
 import { SoftEtherClient } from "../models/SoftEther.js";
 import { constants } from "../utils/constants.js";
-import runPowershell from "../utils/powershell/runPowershell.js";
+import runPowershell from "../utils/Processes/runPowershell.js";
 
 const {
   SOFTETHER_CREATE_VPN_ADAPTER_SCRIPT_PATH,

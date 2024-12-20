@@ -1,6 +1,6 @@
 import { SocketException } from "../utils/SocketException.js";
 import { io, Socket } from "socket.io-client";
-import registerOrchestratorStateHandlers  from "../listeners/orchestratorStateHandlers.js";
+import registerOrchestratorStateHandlers from "../listeners/orchestratorStateHandlers.js";
 import { registerAuxiliaryHandlers } from "../../supported-services/listeners/registerAuxiliaryHandlers.js";
 import { UnrealEngineService } from "../../supported-services/services/unrealEngineService.js";
 import { INodeConfig, NodeConfig } from "../models/NodeConfig.js";
@@ -12,8 +12,9 @@ import { XRITServiceID } from "../models/XRITServiceID.js";
 import { writeConfig } from "./configService.js";
 import { constants } from "../utils/constants.js";
 import { SoftEtherClient } from "../models/SoftEther.js";
+import { createVPNSetting, removeVPNAdapter, removeVPNSetting, shutdownVPN, startupVPN } from "./vpnService.js";
 
-const { DEFAULT_ORCHESTRATOR_PORT } = constants
+const { DEFAULT_ORCHESTRATOR_PORT, EXPRESS_BASE_URL } = constants
 
 export class NodeService {
   private static instance: NodeService;
@@ -31,31 +32,46 @@ export class NodeService {
     return NodeService.instance;
   }
 
-  // Call the middleman API (Express moock app)
-  private expressBaseUrl = 'http://host.docker.internal:2224';
-
   private async createVPNSetting(vpn: SoftEtherClient) {
     try {
-      const response = await axios.post(`${this.expressBaseUrl}/vpn`, { vpn });
-      console.log('VPN setting created:', response.data);
+      var response;
+      if (getArguments().is_dev) {
+        response = await createVPNSetting(vpn);
+        console.log('VPN setting created\n');
+      } else {
+        response = await axios.post(`${EXPRESS_BASE_URL}/vpn`, { vpn });
+        console.log('VPN setting created:', response.data);
+      }
+
     } catch (error: any) {
       console.error('Error creating VPN setting:', error.message);
     }
   }
 
-private async startupVPN(vpnName: string) {
+  private async startupVPN(vpnName: string) {
     try {
-      const response = await axios.post(`${this.expressBaseUrl}/vpn/start`, { vpnName });
-      console.log('VPN started:', response.data);
+      var response;
+      if (getArguments().is_dev) {
+        response = await startupVPN(vpnName);
+        console.log('VPN started\n');
+      } else {
+        const response = await axios.post(`${EXPRESS_BASE_URL}/vpn/start`, { vpnName });
+        console.log('VPN started:', response.data);
+      }
     } catch (error: any) {
       console.error('Error starting VPN:', error.message);
     }
   }
 
-  private async removeVPNAdapter(addapterName: string) {
+  private async removeVPNAdapter(adapterName: string) {
     try {
-      const response = await axios.post(`${this.expressBaseUrl}/vpn/remove-addapter`, { addapterName });
-      console.log('VPN started:', response.data);
+      if (getArguments().is_dev) {
+        await removeVPNAdapter(adapterName);
+        console.log('VPN adapter removed\n');
+      } else {
+        const response = await axios.post(`${EXPRESS_BASE_URL}/vpn/remove-addapter`, { adapterName });
+        console.log('VPN adapter removed:', response.data);
+      }
     } catch (error: any) {
       console.error('Error starting VPN:', error.message);
     }
@@ -63,8 +79,14 @@ private async startupVPN(vpnName: string) {
 
   private async removeVPNSetting(vpnName: string) {
     try {
-      const response = await axios.delete(`${this.expressBaseUrl}/vpn`, {data: { vpnName } });
-      console.log('VPN started:', response.data);
+      if (getArguments().is_dev) {
+        await removeVPNSetting(vpnName);
+        console.log('VPN setting removed\n');
+      } else {
+        const response = await axios.delete(`${EXPRESS_BASE_URL}/vpn`, { data: { vpnName } });
+        console.log('VPN removed:', response.data);
+      }
+
     } catch (error: any) {
       console.error('Error starting VPN:', error.message);
     }
@@ -72,8 +94,13 @@ private async startupVPN(vpnName: string) {
 
   private async shutdownVPN(vpnName: string) {
     try {
-      const response = await axios.post(`${this.expressBaseUrl}/vpn/stop`, { vpnName });
-      console.log('VPN started:', response.data);
+      if (getArguments().is_dev) {
+        await shutdownVPN(vpnName);
+        console.log('VPN setting shutdown\n');
+      } else {
+        const response = await axios.post(`${EXPRESS_BASE_URL}/vpn/stop`, { vpnName });
+        console.log('VPN shutdown:', response.data);
+      }
     } catch (error: any) {
       console.error('Error starting VPN:', error.message);
     }
@@ -86,7 +113,7 @@ private async startupVPN(vpnName: string) {
     in which case the Orchestrator must also be informed of this update.
   */
   async init(config: INodeConfig, has_ip_changed?: boolean) {
-  
+
     this.config = config;
 
     // NOTE: We check this flag to see if this instance is being run a local development instance of XR-IT (more on this in README)
@@ -117,15 +144,13 @@ private async startupVPN(vpnName: string) {
         else this.socket!.emit("node-identifier", config.id);
       };
 
-      const onDisconnect = () => {
-        this.socket = undefined;
-        this.config = undefined;
-
+      const onDisconnect = async () => {
         if (this.unreal_engine_service) {
           this.unreal_engine_service.terminate();
           this.unreal_engine_service = undefined;
         }
 
+        this.socket = undefined;
         console.log("\x1b[31m\x1b[1mYou have disconnected from the orchestrator.\x1b[30m\n");
       };
 
@@ -183,8 +208,6 @@ private async startupVPN(vpnName: string) {
     if (!this.socket)
       throw new SocketException("Invalid operation no connection is currently established with an orchestrator.");
 
-    this.socket.disconnect();
-
     // NOTE: We check this flag to see if this instance is being run a local development instance of XR-IT (more on this in README)
     // If this is the case, we shutdown the VPN
     const is_local_dev = getArguments().is_local_development
@@ -193,6 +216,9 @@ private async startupVPN(vpnName: string) {
       if (!vpn_name) throw new SocketException(`Internal error: cannot shutdown VPN as name not defined.`)
       await this.shutdownVPN(vpn_name);
     }
+    
+    this.config = undefined;
+    this.socket.disconnect();
   }
 
   async updateNetworkIP(ip_address: string) {
@@ -226,6 +252,7 @@ private async startupVPN(vpnName: string) {
       })).data;
 
       config.name = configuration_name;
+      config.vpn.ip = orchestrator_ip;
 
       console.log(`\x1b[32m\x1b[1mNode registration successful!\x1b[0m\n`);
       console.log(`\x1b[36m\x1b[4mNew node configuration saved\x1b[0m`);

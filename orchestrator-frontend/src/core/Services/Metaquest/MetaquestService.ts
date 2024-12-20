@@ -138,6 +138,7 @@ class MetaquestService extends BaseService {
             newNode.data.isOnline,
             node.is_online ? "SUCCESS" : "OFFLINE",
             stream.source.status,
+            true,
           ),
           hardwareNode.id,
           streamNode.id,
@@ -177,4 +178,5 @@ class MetaquestService extends BaseService {
   }
 }
 
-export default new MetaquestService();
+const metaquestServiceInstance = new MetaquestService();
+export default metaquestServiceInstance;

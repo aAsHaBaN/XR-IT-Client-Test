@@ -58,7 +58,7 @@ export class SoftEtherServer implements ISoftEtherServer {
   }
 
   static getConfiguration(): ISoftEtherServer {
-    return structuredClone(this) as any as ISoftEtherServer;
+    return SoftEtherServer.serialize(this.instance) as any as ISoftEtherServer;
   }
 
   static isRunning() {
@@ -90,7 +90,7 @@ export class SoftEtherServer implements ISoftEtherServer {
   }
 
   private async startHub(): Promise<void> {
-    if (!this.virtual_hub?.name || !this.virtual_hub?.port || !this.virtual_hub?.pw || this.admin?.name || this.admin?.pw) {
+    if (!this.virtual_hub?.name || !this.virtual_hub?.port || !this.virtual_hub?.pw || !this.admin?.name || !this.admin?.pw) {
       throw new SocketException(`Virtual Hub and administrator account must be defined before starting the VPN server.`)
     }
 
@@ -110,7 +110,7 @@ export class SoftEtherServer implements ISoftEtherServer {
   }
 
   async stopHub(): Promise<void> {
-    if (!this.virtual_hub?.name || !this.virtual_hub?.port || !this.virtual_hub?.pw || this.admin?.name || this.admin?.pw) {
+    if (!this.virtual_hub?.name || !this.virtual_hub?.port || !this.virtual_hub?.pw || !this.admin?.name || !this.admin?.pw) {
       throw new SocketException(`Virtual Hub and administrator account must be defined before starting the VPN server.`)
     }
 
@@ -132,7 +132,7 @@ export class SoftEtherServer implements ISoftEtherServer {
 
   async startClient(): Promise<void> {
     try {
-      if (this.virtual_hub?.name) throw new SocketException(`Must define virtual hub name before starting client.`)
+      if (!this.virtual_hub?.name) throw new SocketException(`Must define virtual hub name before starting client.`)
       const start_client_args = [{ name: "accountName", val: this.virtual_hub?.name }];
 
       const result = await runPowershell(SOFTETHER_START_CLIENT_SCRIPT_PATH, start_client_args);
@@ -147,7 +147,7 @@ export class SoftEtherServer implements ISoftEtherServer {
 
   async stopClient(): Promise<void> {
     try {
-      if (this.virtual_hub?.name) throw new SocketException(`Must define virtual hub name before starting client.`)
+      if (!this.virtual_hub?.name) throw new SocketException(`Must define virtual hub name before starting client.`)
       const start_client_args = [{ name: "accountName", val: this.virtual_hub?.name }];
 
       const result = await runPowershell(SOFTETHER_STOP_CLIENT_SCRIPT_PATH, start_client_args);

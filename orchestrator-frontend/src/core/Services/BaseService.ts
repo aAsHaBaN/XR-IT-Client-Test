@@ -4,7 +4,12 @@ import { HandleType, IHandle } from "@/core/handles/diagram";
 import { SERVICE_NODES_SIZE } from "./constants";
 import { INodeSize } from "./configuration";
 import { EdgeType } from "@/core/edges/diagram";
-import { CUSTOM_EDGE, ERROR_EDGE, PENDING_EDGE } from "../edges/constants";
+import {
+  EXTERNAL_EDGE,
+  ERROR_EDGE,
+  PENDING_EDGE,
+  INTERNAL_EDGE,
+} from "../edges/constants";
 import { OFFLINE_EDGE } from "../edges/constants";
 
 export abstract class BaseService implements NodeServiceInterface {
@@ -119,6 +124,7 @@ export abstract class BaseService implements NodeServiceInterface {
     isNodeOnline: boolean,
     source: IStreamStatus,
     target: IStreamStatus,
+    internal: boolean = false,
   ): EdgeType {
     const status = isNodeOnline
       ? this.getEdgeStatus(source, target)
@@ -131,7 +137,7 @@ export abstract class BaseService implements NodeServiceInterface {
       case "OFFLINE":
         return OFFLINE_EDGE;
       default:
-        return CUSTOM_EDGE;
+        return internal ? INTERNAL_EDGE : EXTERNAL_EDGE;
     }
   }
 

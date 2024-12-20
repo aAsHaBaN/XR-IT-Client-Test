@@ -141,6 +141,7 @@ class UnrealService extends BaseService {
           newNode.data.isOnline,
           stream.target.status,
           sceneNode.data.input.status,
+          true,
         ),
         streamNode.id,
         sceneNode.id,
@@ -179,4 +180,5 @@ class UnrealService extends BaseService {
   }
 }
 
-export default new UnrealService();
+const unrealServiceInstance = new UnrealService();
+export default unrealServiceInstance;

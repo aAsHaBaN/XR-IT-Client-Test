@@ -149,7 +149,7 @@ async function getLayoutedNodes(
 }
 
 export default function useLayoutElements(algorithm: Algorithm = "layered") {
-  const { getNodes, getEdges, setNodes, setEdges, fitView, zoomTo } =
+  const { getNodes, getEdges, setNodes, setEdges, fitView } =
     useReactFlow<Node>();
 
   const updateLayout = useCallback(async () => {
@@ -165,7 +165,7 @@ export default function useLayoutElements(algorithm: Algorithm = "layered") {
     window.requestAnimationFrame(() => {
       fitView();
     });
-  }, [getNodes, getEdges, setNodes, setEdges, fitView, zoomTo]);
+  }, [getNodes, getEdges, setNodes, setEdges, fitView, algorithm]);
 
   return updateLayout;
 }

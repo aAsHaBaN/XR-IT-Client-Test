@@ -1,6 +1,7 @@
 const baseDirPaths = {
   xritConfig: build_path("./config"),
-  softEtherScripts: build_path("/src/SoftEther-scripts/"),
+  softEtherScripts: build_path("/src/scripts/SoftEther/"),
+  mvnScripts: build_path("/src/scripts/MVN/"),
 };
 
 export const constants = Object.freeze({
@@ -27,6 +28,9 @@ export const constants = Object.freeze({
   SOFTETHER_SHUTDOWN_VPN_SCRIPT_PATH: `${baseDirPaths.softEtherScripts}VPNClient-Shutdown.ps1`,
   SOFTETHER_REMOVE_VPN_ACCOUNT_SCRIPT_PATH: `${baseDirPaths.softEtherScripts}VPNClient-RemoveAccount.ps1`,
   SOFTETHER_REMOVE_VPN_ADAPTER_SCRIPT_PATH: `${baseDirPaths.softEtherScripts}VPNClient-RemoveAdapter.ps1`,
+
+  MVN_GET_MVN_STATUS: `${baseDirPaths.mvnScripts}GetMVNStatus.ps1`,
+  MVN_LAUNCH: `${baseDirPaths.mvnScripts}LaunchMVN.ps1`,
 });
 
 export function build_path(path: string) {

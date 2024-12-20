@@ -70,7 +70,6 @@ export async function startOrchestratorConnection(req: Request, res: Response) {
 
         const node = NodeService.getInstance()
         node.init(config!).then((init_result) => {
-            console.log(`init result: ${inspect(init_result)}`)
             const result = {
                 redirect_address: `http://${config?.orchestrator_socket.ip}:3000/overview`
             }

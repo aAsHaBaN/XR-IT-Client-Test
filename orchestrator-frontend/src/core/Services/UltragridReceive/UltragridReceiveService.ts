@@ -150,6 +150,7 @@ class UltragridReceiveService extends BaseService {
         node.is_online,
         videoStreamNode.data.output.status,
         videoSettingsNode.data.input.status,
+        true,
       ),
       videoStreamNode.id,
       videoSettingsNode.id,
@@ -255,6 +256,7 @@ class UltragridReceiveService extends BaseService {
         node.is_online,
         audioStreamNode.data.output.status,
         audioSettingsNode.data.input.status,
+        true,
       ),
       audioStreamNode.id,
       audioSettingsNode.id,
@@ -276,4 +278,5 @@ class UltragridReceiveService extends BaseService {
   }
 }
 
-export default new UltragridReceiveService();
+const ultragridReceiveServiceInstance = new UltragridReceiveService();
+export default ultragridReceiveServiceInstance;

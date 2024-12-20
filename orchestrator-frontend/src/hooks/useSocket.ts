@@ -1,87 +1,106 @@
 import { disconnect, getSocket } from "@/services/socket";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-
-let socket: Socket | null = getSocket();
 
 function useSocket() {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState("");
   const [transport, setTransport] = useState("N/A");
   const [_, setCounter] = useState(1);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    socket = getSocket();
+    setSocket(getSocket());
+  }, []);
 
+  useEffect(() => {
     if (socket?.connected) {
       onConnect();
+    } else {
+      onDisconnect();
     }
 
-    function onConnect() {
-      if (!socket) return;
-      setIsConnected(true);
-      setTransport(socket.io.engine.transport.name);
-
-      socket.io.engine.on("upgrade", function onUpgrade(transport) {
-        setTransport(transport.name);
-      });
-    }
-
-    function onConnectError() {
-      setCounter(function updateCounterAndSetError(counter) {
-        if (counter === 100) {
-          // reconnectionAttempts option
-          setError("Can't connect to the server.");
-        }
-        return counter + 1;
-      });
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-      setTransport("N/A");
-    }
-
-    socket?.on("connect", onConnect);
-    socket?.on("connect_error", onConnectError);
-    socket?.on("disconnect", onDisconnect);
-
+    setListeners();
     return () => {
-      if (!socket) return;
-      socket.off("connect", onConnect);
-      socket.off("connect_error", onConnectError);
-      socket.off("disconnect", onDisconnect);
+      unsetListeners();
     };
   }, [socket]);
 
-  function resetSocket() {
+  const onConnect = useCallback(() => {
+    if (!socket) return;
+    setIsConnected(true);
+    setTransport(socket.io.engine.transport.name);
+
+    socket.io.engine.on("upgrade", function onUpgrade(transport) {
+      setTransport(transport.name);
+    });
+  }, [socket]);
+
+  const onConnectError = useCallback(() => {
+    setIsConnected(false);
+    setCounter(function updateCounterAndSetError(counter) {
+      if (counter === 100) {
+        // reconnectionAttempts option
+        setError("Can't connect to the server.");
+      }
+      return counter + 1;
+    });
+  }, [socket]);
+
+  const onDisconnect = useCallback(() => {
+    setIsConnected(false);
+    setTransport("N/A");
+  }, [socket]);
+
+  const setListeners = useCallback(() => {
+    socket?.on("connect", onConnect);
+    socket?.on("connect_error", onConnectError);
+    socket?.on("disconnect", onDisconnect);
+  }, [onConnect, onConnectError, onDisconnect]);
+
+  const unsetListeners = useCallback(() => {
+    socket?.off("connect", onConnect);
+    socket?.off("connect_error", onConnectError);
+    socket?.off("disconnect", onDisconnect);
+  }, [onConnect, onConnectError, onDisconnect]);
+
+  const resetSocket = useCallback(() => {
     disconnect();
-    socket = getSocket();
-  }
+    setSocket(getSocket());
+  }, [socket]);
 
-  function emit(event: string, ...data: any) {
-    if (!socket?.connected) {
-      return;
-    }
+  const emit = useCallback(
+    (event: string, ...data: any) => {
+      if (!socket?.connected) {
+        return;
+      }
 
-    socket.emit(event, ...data);
-  }
+      socket.emit(event, ...data);
+    },
+    [socket],
+  );
 
-  function listen(event: string, callback: (...args: any[]) => void) {
-    if (!socket?.connected) {
-      return;
-    }
+  const listen = useCallback(
+    (event: string, callback: (...args: any[]) => void) => {
+      if (!socket?.connected) {
+        return;
+      }
 
-    socket.on(event, callback);
-  }
+      socket.on(event, callback);
+    },
+    [socket],
+  );
 
-  function off(event: string, callback?: (...args: any[]) => void) {
-    if (!socket?.connected) {
-      return;
-    }
+  const off = useCallback(
+    (event: string, callback?: (...args: any[]) => void) => {
+      if (!socket?.connected) {
+        return;
+      }
 
-    socket.off(event, callback);
-  }
+      socket.off(event, callback);
+    },
+    [socket],
+  );
 
   return { isConnected, transport, error, resetSocket, emit, listen, off };
 }

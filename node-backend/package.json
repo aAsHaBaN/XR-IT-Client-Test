@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "npx tsx ./src/index.ts",
-    "dev": "npx tsx watch ./src/index.ts",
+    "dev": "npx tsx watch ./src/index.ts is_dev=true",
     "dev-auto-vpn": "npx tsx watch ./src/index-auto-vpn.ts",
     "mocks": "npx tsx watch ./src/mock/mocks.ts",
     "mocks:all": "npx tsx watch ./src/mock/mocks.ts mvn=2 ue=2 optitrack=1 metaquest=1 ultragrid_send=1 ultragrid_receive=1",

@@ -1,6 +1,6 @@
 import "./style.css";
-import CustomEdge from "./CustomEdge";
+import ExternalEdge from "./ExternalEdge";
 import ErrorEdge from "./ErrorEdge";
 import PendingEdge from "./PendingEdge";
 
-export { CustomEdge, ErrorEdge, PendingEdge };
+export { ExternalEdge, ErrorEdge, PendingEdge };

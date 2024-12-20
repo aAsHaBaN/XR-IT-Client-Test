@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import vpn from './routes/vpn';
+import { mvnRoute } from './routes/mvn';
+import { vpnRoute } from './routes/vpn';
 
 dotenv.config();
 
@@ -17,10 +18,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use(
-    "/",
-    vpn
-);
+app.use("/vpn", vpnRoute);
+app.use("/mvn", mvnRoute);
+
 
 app.get('/', (req, res) => {
     res.send('Hello from Mock Express API!');

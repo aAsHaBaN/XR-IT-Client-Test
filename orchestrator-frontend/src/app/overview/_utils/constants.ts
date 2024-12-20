@@ -1,5 +1,5 @@
-import { CUSTOM_EDGE } from "@/core/edges/constants";
-import CustomEdge from "@/core/edges/CustomEdge";
+import { INTERNAL_EDGE } from "@/core/edges/constants";
+import InternalEdge from "@/core/edges/InternalEdge";
 import { LAB_NODE } from "@/core/Lab/constants";
 import LabNode from "@/core/Lab/LabNode";
 import { ORCHESTRATOR_NODE } from "@/core/Orchestrator/constants";
@@ -12,5 +12,5 @@ export const NODE_TYPES_MAP: NodeTypes = {
 };
 
 export const EDGE_TYPES_MAP: EdgeTypes = {
-  [CUSTOM_EDGE]: CustomEdge,
+  [INTERNAL_EDGE]: InternalEdge,
 };

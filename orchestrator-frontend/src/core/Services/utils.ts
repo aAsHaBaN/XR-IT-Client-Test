@@ -99,6 +99,20 @@ export function getNodeColor(type: string) {
   }
 }
 
+export function getServiceStatusClass(status: IServiceStatus) {
+  switch (status) {
+    case "SUCCESS":
+      return "status--running";
+    case "ERROR":
+      return "status--error";
+    case "PENDING":
+    case "UPDATE_PENDING":
+      return "status--pending";
+    default:
+      return "status--default";
+  }
+}
+
 export function formatServiceName(name: string) {
   return name
     .split("_")

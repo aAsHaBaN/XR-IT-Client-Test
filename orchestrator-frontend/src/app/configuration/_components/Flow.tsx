@@ -20,12 +20,11 @@ import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import useLayoutElements from "@/hooks/useLayoutElements";
 import { EDGE_TYPES_MAP, NODE_TYPES_MAP } from "@/core/Services/constants";
 import { createEdge } from "@/services/config";
-import { checkConnection, saveConfiguration } from "@/services/config";
+import { checkConnection } from "@/services/config";
 import { PENDING_EDGE } from "@/core/edges/constants";
-import { IServiceNodeData, IStreamNodeData } from "@/types/diagram";
+import { IStreamNodeData } from "@/types/diagram";
 import useUpdateDiagram from "@/hooks/useUpdateDiagram";
 import { getNodeColor } from "@/core/Services/utils";
-import GlobalErrors from "@/components/GlobalErrors";
 import SaveButton from "@/components/SaveButton";
 
 type IFlowProps = {
@@ -33,16 +32,10 @@ type IFlowProps = {
   configEdges: Edge[];
   dropNode: (nodeId: string, position: { x: number; y: number }) => void;
   configurationName: string;
-  errors: IError[];
+  children?: React.ReactNode;
 };
 
-function Flow({
-  configNodes,
-  configEdges,
-  dropNode,
-  configurationName,
-  errors,
-}: IFlowProps) {
+function Flow({ configNodes, configEdges, dropNode, children }: IFlowProps) {
   const { getNode, screenToFlowPosition, fitView, zoomTo } = useReactFlow();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>(configNodes);
@@ -52,12 +45,9 @@ function Flow({
   const updateLayout = useLayoutElements();
   const nodesInitialized = useNodesInitialized();
 
-  const nodeColor = useCallback(
-    (node: Node) => {
-      return getNodeColor(node.type ?? "");
-    },
-    [getNodeColor],
-  );
+  const nodeColor = useCallback((node: Node) => {
+    return getNodeColor(node.type ?? "");
+  }, []);
 
   useUpdateDiagram(configNodes, configEdges, setNodes, setEdges, firstLoad);
 
@@ -69,7 +59,7 @@ function Flow({
         zoomTo(1);
       });
     }
-  }, [nodesInitialized, updateLayout, firstLoad]);
+  }, [nodesInitialized, updateLayout, firstLoad, fitView, zoomTo]);
 
   const onConnect: OnConnect = useCallback(
     (connection) => {
@@ -145,17 +135,10 @@ function Flow({
       <Panel position="top-right">
         <SaveButton />
       </Panel>
-      <Panel position="top-left">
-        <div className="flex items-center gap-2 font-bold text-secondary">
-          <span>{configurationName}</span>
-        </div>
-      </Panel>
-      <Panel position="top-center">
-        <GlobalErrors errors={errors} />
-      </Panel>
       <Panel position="bottom-center">
         <div id="errors-container"></div>
       </Panel>
+      {children}
     </ReactFlow>
   );
 }

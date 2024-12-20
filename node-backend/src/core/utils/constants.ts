@@ -4,10 +4,12 @@ const baseDirPaths = {
 };
 
 export const constants = Object.freeze({
+// Call the middleman API (Express moock app)
+  EXPRESS_BASE_URL: 'http://host.docker.internal:2224',
   // Default socket port for interface
   DEFAULT_ORCHESTRATOR_PORT: 1194,
   DEFAULT_SOCKET_PORT: 2223,
-  
+
   // Config location
   CONFIG_DIR: baseDirPaths.xritConfig,
   DEFAULT_CONFIG_PATH: build_path(`${baseDirPaths.xritConfig}/xrit-node-config.json`),

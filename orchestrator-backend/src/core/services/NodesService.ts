@@ -14,9 +14,10 @@ import { isGuidValid } from "../utils/validation";
 const { DEFAULT_SOCKET_PORT, IP_MIN, IP_MAX } = constants;
 
 export class NodesService {
+    private static instance: NodesService;
     public nodes: Node[]
 
-    constructor(nodes: any[]) {
+    private constructor(nodes: any[]) {
         this.nodes = nodes.map(n => { return new Node(n) })
         const num_orchestrators = this.nodes.filter(n => n.role === 'orchestrator').length
 
@@ -28,6 +29,16 @@ export class NodesService {
         }
 
         this.nodes.find(n => n.role === 'orchestrator')!.is_online = true
+    }
+
+    static initialize(nodes: any[]) {
+        NodesService.instance = new NodesService(nodes)
+        return NodesService.instance;
+    }
+
+    static getInstance() {
+        if(!NodesService.instance) throw new SocketException('NodesService not instantiated');
+        return NodesService.instance
     }
 
     getNode(id: string): Node {
@@ -97,7 +108,7 @@ export class NodesService {
         After this, it partitions a private network IP address for this machine and generations a blank template for each service
         provided.
     */
-    registerNode(machine_alias: string, lab_id: string, services: XRITServiceID[], av_inputs: AudioVisualIO[], av_outputs: AudioVisualIO[]): Node {
+    registerNode(lab_id: string, machine_alias: string, services: XRITServiceID[], av_inputs: AudioVisualIO[], av_outputs: AudioVisualIO[]): Node {
         const id = crypto.randomUUID();
         const ip_address = partitionIP(this.nodes.map(n => { return n.local_ip }))
 
@@ -136,7 +147,6 @@ export class NodesService {
     }
 
     terminateNode(socket_id: string): Node | undefined {
-        console.log('Attempting to disconnect');
         const matching_node = this.nodes.find((n) => n.socket?.id === socket_id);
         if (matching_node) {
             console.log(`Found node to disconnect: ${matching_node.machine_alias}`);

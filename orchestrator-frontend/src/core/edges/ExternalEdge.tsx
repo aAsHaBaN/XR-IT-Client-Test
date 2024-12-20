@@ -11,7 +11,7 @@ import { nextTick } from "process";
 import { useEffect } from "react";
 import { PENDING_EDGE } from "./constants";
 
-export default function CustomEdge({
+export default function ExternalEdge({
   id,
   source,
   sourceX,
@@ -28,6 +28,7 @@ export default function CustomEdge({
     nextTick(() =>
       updateEdge(id, {
         animated: true,
+        selectable: true,
       }),
     );
   }, [updateEdge, id]);

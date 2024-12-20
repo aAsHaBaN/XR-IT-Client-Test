@@ -22,16 +22,15 @@ import { EDGE_TYPES_MAP, NODE_TYPES_MAP } from "../_utils/constants";
 import { ORCHESTRATOR_NODE } from "@/core/Orchestrator/constants";
 import { LAB_NODE } from "@/core/Lab/constants";
 import useUpdateDiagram from "@/hooks/useUpdateDiagram";
-import GlobalErrors from "@/components/GlobalErrors";
 import SaveButton from "@/components/SaveButton";
 
 type IFlowProps = {
   configNodes: Node[];
   configEdges: Edge[];
-  errors: IError[];
+  children: React.ReactNode;
 };
 
-function Flow({ configNodes, configEdges, errors }: IFlowProps) {
+function Flow({ configNodes, configEdges, children }: IFlowProps) {
   const { fitView, zoomTo } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>(configNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(configEdges);
@@ -65,7 +64,7 @@ function Flow({ configNodes, configEdges, errors }: IFlowProps) {
         zoomTo(1);
       });
     }
-  }, [nodesInitialized, updateLayout, setFirstLoad]);
+  }, [nodesInitialized, updateLayout, setFirstLoad, fitView, zoomTo]);
 
   return (
     <ReactFlow
@@ -79,19 +78,24 @@ function Flow({ configNodes, configEdges, errors }: IFlowProps) {
     >
       <MiniMap nodeStrokeWidth={3} nodeColor={nodeColor} />
       <Controls>
-        <ControlButton onClick={updateLayout} title="redistribute">
+        <ControlButton
+          onClick={() => {
+            updateLayout(false).then(() => {
+              fitView();
+            });
+          }}
+          title="redistribute"
+        >
           <ArrowPathIcon className="fill-current text-inherit" />
         </ControlButton>
       </Controls>
-      <Panel position="top-center">
-        <GlobalErrors errors={errors} />
-      </Panel>
       <Panel position="top-right">
         <SaveButton />
       </Panel>
       <Panel position="bottom-center">
         <div id="errors-container"></div>
       </Panel>
+      {children}
     </ReactFlow>
   );
 }

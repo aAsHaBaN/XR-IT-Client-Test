@@ -75,7 +75,7 @@ class OptitrackService extends BaseService {
       streamNode.data.input = this.createHandle(
         streamNode.id,
         nodeId,
-        `Stream ${index + 1}`,
+        `Stream ${stream.target.entry_point.value}`,
         true,
         stream.source.status,
         BASE_HANDLE,
@@ -84,7 +84,7 @@ class OptitrackService extends BaseService {
       streamNode.data.output = this.createHandle(
         streamNode.id,
         nodeId,
-        `Stream ${index + 1}`,
+        `Stream ${stream.target.entry_point.value}`,
         false,
         stream.source.status,
         BASE_HANDLE,
@@ -101,6 +101,7 @@ class OptitrackService extends BaseService {
             newNode.data.isOnline,
             node.is_online ? "SUCCESS" : "OFFLINE",
             stream.source.status,
+            true,
           ),
           hardware.id,
           streamNode.id,
@@ -178,4 +179,5 @@ class OptitrackService extends BaseService {
   }
 }
 
-export default new OptitrackService();
+const optitrackServiceInstance = new OptitrackService();
+export default optitrackServiceInstance;

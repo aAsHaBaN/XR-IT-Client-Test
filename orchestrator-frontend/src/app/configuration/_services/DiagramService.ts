@@ -2,7 +2,11 @@ import { type DiagramServiceInterface } from "@/types/diagram";
 import { Edge, Node } from "@xyflow/react";
 import { getInstance } from "@/core/Services/utils";
 import { BASE_NODE } from "@/core/Services/constants";
-import { CUSTOM_EDGE, OFFLINE_EDGE } from "@/core/edges/constants";
+import {
+  EXTERNAL_EDGE,
+  INTERNAL_EDGE,
+  OFFLINE_EDGE,
+} from "@/core/edges/constants";
 import { BaseService } from "@/core/Services/BaseService";
 import { EdgeType } from "@/core/edges/diagram";
 
@@ -136,8 +140,8 @@ function defineEdge(
     targetHandle ??
       `${stream.target.node_id}+${stream.target.configuration_id}+${stream.id}+input`,
     {
-      selectable: type === CUSTOM_EDGE || type === OFFLINE_EDGE,
-      animated: type === CUSTOM_EDGE,
+      selectable: type === EXTERNAL_EDGE || type === OFFLINE_EDGE,
+      animated: type === EXTERNAL_EDGE || type === INTERNAL_EDGE,
     },
   );
 

@@ -1,7 +1,7 @@
 import dgram from "dgram";
 import xml2js from "xml2js";
 import { MVNStreamingTarget } from "../models/MVN.js";
-import runPowershell from "../../core/utils/powershell/runPowershell.js";
+import runPowershell from "../../core/utils/Processes/runPowershell.js";
 import { networkInterfaces } from "os";
 import { SocketException } from "../../core/utils/SocketException.js";
 import { build_path } from "../../core/utils/constants.js";

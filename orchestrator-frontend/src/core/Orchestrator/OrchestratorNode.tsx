@@ -5,10 +5,11 @@ export type OrchestratorNode = Node<IOrchestratorNodeData>;
 
 function OrchestratorNode({ id, data }: NodeProps<OrchestratorNode>) {
   return (
-    <div className="custom-node orchestrator-node rounded-full">
-      <div className="p-2 px-4">
-        <h3 className="font-bold underline">{data.label}</h3>
-        <h5 className="text-sm">{data.configName}</h5>
+    <div className="custom-node orchestrator-node min-h-fit min-w-56 rounded-2xl">
+      <div className="flex flex-col gap-2 px-4 py-2">
+        <h4 className="italic">{data.configName}</h4>
+        <h3 className="font-bold">{data.label}</h3>
+        <h5 className="text-sm">{data.ip}</h5>
       </div>
       <Handle
         type="source"

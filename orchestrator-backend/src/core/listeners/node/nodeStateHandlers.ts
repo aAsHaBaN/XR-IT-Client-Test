@@ -1,7 +1,6 @@
 import { Socket } from "socket.io";
 import { Node } from "../../models/Node";
 import { registerAuxiliaryNodeHandlers } from "../../../supported-services/node-listeners/registerAuxiliaryHandlers";
-import { resolveRemoveStreamTarget, resolveRemoveStreamSource, resolveCreateStreamSource, resolveCreateStreamTarget } from "../../../supported-services/services/resolveServiceOperation";
 import InterfacesNamespace from "../../namespaces/InterfacesNamespace";
 import { LabService } from "../../services/LabService";
 import { NodesService } from "../../services/NodesService";
@@ -41,13 +40,13 @@ export default (socket: Socket, lab_service: LabService, node_service: NodesServ
             if (s.source.node_id === id) {
                 const target = node_service.getNode(s.target.node_id)
                 console.log(`\x1b[34mRemoving old ${s.target.configuration_id} stream target to '${target.machine_alias}' associated with ${previous_node_settings.machine_alias} and recreating with new IP address.\x1b[0m\n`)
-                resolveRemoveStreamTarget(s, previous_node_settings, target)
-                resolveCreateStreamTarget(s, new_node_settings, target)
+                streams_service.resolveRemoveStreamTarget(s, previous_node_settings, target)
+                streams_service.resolveCreateStreamTarget(s, new_node_settings, target)
             } else {
                 const source = node_service.getNode(s.source.node_id);
                 console.log(`\x1b[34mRemoving ${s.source.configuration_id} stream source from '${source.machine_alias}' associated with ${previous_node_settings.machine_alias} and recreating with new IP address.\x1b[0m\n`)
-                resolveRemoveStreamSource(s, source, previous_node_settings)
-                resolveCreateStreamTarget(s, source, new_node_settings)
+                streams_service.resolveRemoveStreamSource(s, source, previous_node_settings)
+                streams_service.resolveCreateStreamTarget(s, source, new_node_settings)
             }
         })
     }
@@ -61,11 +60,11 @@ export default (socket: Socket, lab_service: LabService, node_service: NodesServ
             if (s.source.node_id === id) {
                 const target = node_service.getNode(s.target.node_id)
                 console.log(`\x1b[33mRemoving ${s.target.configuration_id} stream target to '${target.machine_alias}' associated with ${node.machine_alias}\x1b[0m\n`)
-                resolveRemoveStreamTarget(s, node, target)
+                streams_service.resolveRemoveStreamTarget(s, node, target)
             } else {
                 const source = node_service.getNode(s.source.node_id);
                 console.log(`\x1b[33mRemoving ${s.source.configuration_id} stream source from '${source.machine_alias}' associated with ${node.machine_alias}\x1b[0m\n`)
-                resolveRemoveStreamSource(s, source, node)
+                streams_service.resolveRemoveStreamSource(s, source, node)
             }
         })
 

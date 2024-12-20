@@ -5,7 +5,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { authRoute } from "./core/routes/auth";
 import { configsRoute } from "./core/routes/config";
-import { NodesController } from "./core/controllers/nodes";
+import { registerNode } from "./core/controllers/nodes";
 import InterfacesNamespace from "./core/namespaces/InterfacesNamespace";
 import NodesNamespace from "./core/namespaces/NodesNamespace";
 import { ConfigurationService, serializeState } from "./core/services/ConfigurationService";
@@ -56,14 +56,13 @@ export async function launchOrchestrator(config: any) {
     }
 
     const labs_service = new LabService(config.labs);
-    const nodes_service = new NodesService(config.nodes);
     const streams_service = new StreamsService(config.streams);
+    const nodes_service = NodesService.initialize(config.nodes);
 
     const vpn = await SoftEtherServer.initialize(config.vpn, nodes_service.getOrchestratorNode().local_ip);
     const configuration_settings = ConfigurationService.initialize(config.id, config.configuration_name);
 
-    const nodes_controller = new NodesController(nodes_service);
-    app.post('/registerNode', nodes_controller.registerNode)
+    app.post('/registerNode', registerNode)
 
     NodesNamespace.instantiate(io, labs_service, nodes_service, streams_service);
     InterfacesNamespace.instantiate(io, configuration_settings, vpn, labs_service, nodes_service, streams_service);

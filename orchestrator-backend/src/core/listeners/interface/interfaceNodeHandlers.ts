@@ -8,7 +8,6 @@ import { INode } from "../../models/Node";
 import { NodesService } from "../../services/NodesService";
 import { StreamsService } from "../../services/StreamsService";
 import { inspect } from "util";
-import { resolveRemoveStreamSource, resolveRemoveStreamTarget } from "../../../supported-services/services/resolveServiceOperation";
 
 export default (socket: Socket, node_service: NodesService, stream_service: StreamsService) => {
     const onUpdateNodeSettings = function (id: string, node_settings: INode) {
@@ -61,9 +60,12 @@ export default (socket: Socket, node_service: NodesService, stream_service: Stre
             const node = node_service.getNode(node_id);
             console.log(`\x1b[36mReceived request to add ${service_id} to ${node.machine_alias}'\x1b[0m\n`);
 
-            // Only one Unreal Engine configuration per node.
-            if (service_id === "UNREAL_ENGINE" && node.configurations.some(c => c.software_id === "UNREAL_ENGINE")) {
-                throw new SocketException(`${node.machine_alias} already has an Unreal Engine configuration registered and there can only be one at a time.`)
+            // Only one Unreal Engine, MVN or OptiTrack configuration per node.
+            if ((service_id === "UNREAL_ENGINE" ||
+                service_id === "OPTITRACK" ||
+                service_id === "MVN") &&
+                node.configurations.some(c => c.software_id === service_id)) {
+                throw new SocketException(`${node.machine_alias} already has an ${service_id} configuration registered and there can only be one at a time.`)
             }
 
             const configuration = new XRITServicesConfig({
@@ -111,13 +113,13 @@ export default (socket: Socket, node_service: NodesService, stream_service: Stre
                     const target_node = node_service.getNode(s.target.node_id);
                     console.log(`\x1b[36mRemoving stream from ${node.machine_alias} to ${target_node.machine_alias} associated with removal of configuration ${configuration_id}\n`);
                     stream_service.setStreamAsPending(s.id, "TARGET", "PENDING_DELETE")
-                    resolveRemoveStreamTarget(s, node, target_node)
+                    stream_service.resolveRemoveStreamTarget(s, node, target_node)
                 } else if (s.target.configuration_id === configuration_id) {
                     s.target.status = "DELETED"
                     const source_node = node_service.getNode(s.source.node_id)
                     console.log(`\x1b[36mRemoving stream from ${source_node.machine_alias} to ${node.machine_alias} associated with removal of configuration ${configuration_id}\n`);
                     stream_service.setStreamAsPending(s.id, "SOURCE", "PENDING_DELETE")
-                    resolveRemoveStreamSource(s, source_node, node)
+                    stream_service.resolveRemoveStreamSource(s, source_node, node)
                 }
             })
 
@@ -163,7 +165,7 @@ export default (socket: Socket, node_service: NodesService, stream_service: Stre
                 case "ULTRAGRID_SEND":
                 case "ULTRAGRID_RECEIVE":
                     break
-                    // TO DO - UPDATE STREAMS ONCE UPDATE IS COMPLETE
+                // TO DO - UPDATE STREAMS ONCE UPDATE IS COMPLETE
                 // If Unreal Engine is online, we ust send update to Unreal Engine so that settings can be updated in software
                 // Otherwise, we simply update the configuration as above.
                 case "UNREAL_ENGINE":

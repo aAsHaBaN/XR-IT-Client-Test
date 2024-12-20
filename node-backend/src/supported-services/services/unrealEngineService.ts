@@ -103,6 +103,7 @@ export class UnrealEngineService {
           xrit_socket.emit(ORCHESTRATOR_EVENT_UE_INITIALIZED, configuration_id, settings);
           plugin_initialization_status.has_config_set = true;
         } else {
+          settings = payload
           xrit_socket.emit(ORCHESTRATOR_EVENT_UE_STATUS, payload);
         }
       }
@@ -134,7 +135,6 @@ export class UnrealEngineService {
       }
 
       socket.on("message", onMessage);
-
       this.ue_socket = socket;
       console.log("\x1b[32m\x1b[1mWaiting for plugin initialization...\x1b[0m\n");
     });
@@ -214,7 +214,8 @@ function getWebSocketMessagePayload(message: string) {
       console.log(inspect(payload, { showHidden: false, depth: null, colors: true }))
       return payload
     } catch (e) {
-      throw new SocketException("Incorrectly formatted payload.");
+     console.log("\x1b[31m\x1b[1mIncorrectly formatted payload.\n\x1b[0m");
+     console.log(inspect(message, { showHidden: false, depth: null, colors: true }))
     }
   }
 }

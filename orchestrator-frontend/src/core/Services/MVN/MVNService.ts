@@ -3,7 +3,6 @@ import { Edge, Node } from "@xyflow/react";
 import { NEW_STREAM_HANDLE, BASE_HANDLE } from "@/core/handles/constants";
 import { IServiceNodeData, IStreamNodeData } from "@/types/diagram";
 import { BaseService } from "../BaseService";
-import { CUSTOM_EDGE, OFFLINE_EDGE } from "@/core/edges/constants";
 
 class MVNService extends BaseService {
   createNodes(
@@ -68,7 +67,7 @@ class MVNService extends BaseService {
       streamNode.data.input = this.createHandle(
         streamNode.id,
         nodeId,
-        `Stream ${index + 1}`,
+        `Stream ${stream.target.entry_point.value}`,
         true,
         stream.source.status,
         BASE_HANDLE,
@@ -77,7 +76,7 @@ class MVNService extends BaseService {
       streamNode.data.output = this.createHandle(
         streamNode.id,
         nodeId,
-        `Stream ${index + 1}`,
+        `Stream ${stream.target.entry_point.value}`,
         false,
         stream.source.status,
         BASE_HANDLE,
@@ -94,6 +93,7 @@ class MVNService extends BaseService {
             newNode.data.isOnline,
             node.is_online ? "SUCCESS" : "OFFLINE",
             stream.source.status,
+            true,
           ),
           hardware.id,
           streamNode.id,
@@ -172,4 +172,5 @@ class MVNService extends BaseService {
   }
 }
 
-export default new MVNService();
+const mvnServiceInstance = new MVNService();
+export default mvnServiceInstance;

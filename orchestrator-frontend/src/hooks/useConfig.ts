@@ -37,19 +37,19 @@ export default function useConfig(diagramService: DiagramServiceInterface) {
       console.info("Event: config:orchestrator-config");
       configUpdate(config);
     });
-  }, [configUpdate]);
+  }, [configUpdate, emit, listen]);
 
   const listenToConfigUpdate = useCallback(() => {
     listen("config:orchestrator-config-updated", (config) => {
       console.info("Event: config:orchestrator-config-updated");
       configUpdate(config);
     });
-  }, [configUpdate]);
+  }, [configUpdate, listen]);
 
   const stopListening = useCallback(() => {
     off("config:orchestrator-config-updated");
     off("config:orchestrator-config");
-  }, []);
+  }, [off]);
 
   useEffect(() => {
     loadConfig();

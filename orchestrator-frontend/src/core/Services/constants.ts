@@ -1,11 +1,12 @@
 import { EdgeTypes, NodeTypes } from "@xyflow/react";
 import {
-  CUSTOM_EDGE,
+  EXTERNAL_EDGE,
   ERROR_EDGE,
   OFFLINE_EDGE,
   PENDING_EDGE,
+  INTERNAL_EDGE,
 } from "@/core/edges/constants";
-import { PendingEdge, CustomEdge, ErrorEdge } from "@/core/edges";
+import { PendingEdge, ExternalEdge, ErrorEdge } from "@/core/edges";
 import {
   MVN_NODE,
   MVN_STREAM_NODE,
@@ -70,6 +71,7 @@ import {
 import { BaseNode } from "./BaseNode";
 import { INodeSize } from "./configuration";
 import OfflineEdge from "../edges/OfflineEdge";
+import InternalEdge from "../edges/InternalEdge";
 export const BASE_NODE = "base-node";
 
 export const NODE_TYPES_MAP: NodeTypes = {
@@ -119,7 +121,8 @@ export const SERVICE_TYPES_MAP: { [key: string]: any } = {
 };
 
 export const EDGE_TYPES_MAP: EdgeTypes = {
-  [CUSTOM_EDGE]: CustomEdge,
+  [EXTERNAL_EDGE]: ExternalEdge,
+  [INTERNAL_EDGE]: InternalEdge,
   [PENDING_EDGE]: PendingEdge,
   [ERROR_EDGE]: ErrorEdge,
   [OFFLINE_EDGE]: OfflineEdge,

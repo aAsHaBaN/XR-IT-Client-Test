@@ -2,6 +2,7 @@ import { Edge, Node } from "@xyflow/react";
 import OrchestratorService from "@/core/Orchestrator/OrchestratorService";
 import LabService from "@/core/Lab/LabService";
 import { DiagramServiceInterface } from "@/types/diagram";
+import { INTERNAL_EDGE } from "@/core/edges/constants";
 
 const DiagramService: DiagramServiceInterface = {
   generateDiagram,
@@ -18,6 +19,7 @@ function generateDiagram(config: IConfiguration): {
   const [newNodes, newEdges] = OrchestratorService.createNodes(
     config.configuration_name,
     config.id,
+    config.nodes.find((n) => n.role === "orchestrator")?.local_ip ?? "",
   );
   nodes.push(...newNodes);
   edges.push(...newEdges);
@@ -34,7 +36,7 @@ function generateDiagram(config: IConfiguration): {
       id: `${config.id}+${lab.id}`,
       source: config.id,
       target: lab.id,
-      type: "custom-edge",
+      type: INTERNAL_EDGE,
       selectable: false,
       deletable: false,
       style: {

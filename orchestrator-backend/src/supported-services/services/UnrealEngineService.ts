@@ -27,7 +27,7 @@ export function addUnrealEngineStreamSource(source_node: Node, unreal_node: Node
     source.settings = {
       server_address: source_node.local_ip,
       client_address: unreal_node.local_ip,
-      is_Multicast: false
+      is_multicast: false
     }
   }
 

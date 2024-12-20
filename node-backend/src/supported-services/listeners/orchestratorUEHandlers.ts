@@ -19,6 +19,7 @@ export default (socket: Socket, node: NodeService) => {
       if (node.unreal_engine_service && node.unreal_engine_service.configuration_id === configuration_id) {
         console.log("This Unreal Engine configuration is already enabled on this node, updating settings\n");
         node.unreal_engine_service.setConfiguration(settings);
+        socket.emit(`${UEServiceID}:initialized`, configuration_id);
       } else {
         node.unreal_engine_service?.terminate();
         node.unreal_engine_service = new UnrealEngineService(configuration_id, settings, socket);

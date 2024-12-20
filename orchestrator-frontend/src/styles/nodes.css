@@ -2,7 +2,7 @@
 
 @layer components {
   .tags {
-    @apply -mt-4 mb-8 flex w-full flex-wrap justify-center gap-2 px-2;
+    @apply -mt-4 mb-8 flex w-full flex-wrap justify-center gap-2 px-2 antialiased;
   }
   .tag {
     @apply relative flex items-center gap-1 text-nowrap rounded-3xl border-2 border-black px-2 py-1 text-center text-xs font-bold;
@@ -51,11 +51,11 @@
   }
 
   .custom-node__header {
-    @apply h-16 rounded-b-xl border-b-2 border-black p-1;
+    @apply h-16 rounded-b-xl border-b-2 border-black p-1 pt-2;
   }
 
   .custom-node__title {
-    @apply relative px-2 font-bold underline;
+    @apply relative px-2 font-extrabold underline decoration-1 underline-offset-2;
   }
 
   .subnode {
@@ -94,11 +94,15 @@
     @apply animate-pulse border-2 border-green-500 bg-green-400;
   }
 
-  .status--stopped {
+  .status--pending {
     @apply border-2 border-orange-600 bg-orange-500;
   }
 
   .status--error {
     @apply border-2 border-red-700 bg-red-600;
+  }
+
+  .status--default {
+    @apply border-2 border-gray-500 bg-gray-400;
   }
 }

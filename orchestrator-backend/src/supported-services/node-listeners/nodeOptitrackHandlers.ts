@@ -1,13 +1,11 @@
 import { XRITServiceID, XRITServicesConfig } from "../models/XRITServiceConfig";
-import { Stream } from "../../core/models/Stream";
 import { SocketException } from "../../core/utils/SocketException";
 import { Node } from "../../core/models/Node";
 import InterfacesNamespace from "../../core/namespaces/InterfacesNamespace";
-import { addOptiTrackStreamTarget } from "../services/OptiTrackService";
-import { inspect } from "node:util";
 import { NodesService } from "../../core/services/NodesService";
 import { StreamsService } from "../../core/services/StreamsService";
 import { onReceiveHeartBeatResponse } from "../../core/services/HeartbeatService";
+import { OptiTrackSettings } from "../models/OptiTrack";
 
 const OptitrackServiceID: XRITServiceID = "OPTITRACK"
 
@@ -19,28 +17,37 @@ export default (node: Node, node_service: NodesService, stream_service: StreamsS
         configuration.status = "SUCCESS";
 
         console.log(`\x1b[1m\x1b[32mOptitrack initialized on ${node.machine_alias}!\x1b[0m`);
+        console.log(`\x1b[1m\x1b[32mPer OptiTrack settings, all streams are ${configuration.settings.is_streaming_enabled ? "enabled" : "disabled"}\x1b[0m`);
         console.log();
 
-        const ot_streams = stream_service.streams.filter((s: Stream) => s.source.configuration_id === configuration_id);
-        ot_streams.forEach(s => {
-            stream_service.setStreamAsPending(s.id, "SOURCE", "PENDING");
+        stream_service.streams = stream_service.streams.map(s => {
+            if (s.source.configuration_id === configuration_id) {
+                s.source.status = "SUCCESS"
+            }
+
+            return s;
         })
 
-        const pending_ot_streams = stream_service.pending_streams.filter((s: Stream) => s.source.configuration_id === configuration!.id);
-        if (pending_ot_streams.length > 0) console.log(`\x1b[34mCreating ${pending_ot_streams.length} preconfigured OptiTrack stream targets on ${node.machine_alias}...\x1b[0m\n`);
-
-        pending_ot_streams.forEach(s => {
-            const target_node = node_service.getNode(s.target.node_id)
-            addOptiTrackStreamTarget(node, target_node!, s);
-
+        stream_service.pending_streams.forEach(s => {
+            if (s.source.configuration_id === configuration_id && s.source.status === "PENDING") {
+                stream_service.onStreamSourceCreated(s.id)
+            } else {
+                stream_service.onStreamSourceDeleted(s.id);
+            }
         });
 
         InterfacesNamespace.emitConfigUpdate();
     };
 
     const onOptitrackHeartBeat = function (configuration_id: string, is_running: boolean) {
-        onReceiveHeartBeatResponse(node, node_service, stream_service, configuration_id, is_running);
-        InterfacesNamespace.emitConfigUpdate();
+        const relevant_streams = stream_service.getPendingStreamsByConfiguration(configuration_id);
+        
+        // If we have pending streams, we may be turning the service on and off, therefore
+        // this update is not relevant.
+        if (relevant_streams.length === 0) {
+            onReceiveHeartBeatResponse(node, node_service, stream_service, configuration_id, is_running);
+            InterfacesNamespace.emitConfigUpdate();
+        }
     };
 
     const onOptitrackTerminated = function (configuration_id: string) {
@@ -54,26 +61,51 @@ export default (node: Node, node_service: NodesService, stream_service: StreamsS
         InterfacesNamespace.emitConfigUpdate();
     }
 
-    const onOptitrackStreamTargetAdded = function (stream_id: string) {
-        const stream = stream_service.onStreamSourceCreated(stream_id);
-        console.log(`\x1b[4m\x1b[32mOptiTrack stream target added to ${node.machine_alias}!\x1b[0m`);
-        console.log(inspect(stream, false, null, true));
-        console.log();
+    const onOptitrackStreamingEnabled = function (configuration_id: string) {
+        const configuration = node.getConfiguration(configuration_id);
+        configuration.settings.is_streaming_enabled = true;
+
+        const optitrack_streams = stream_service.getStreamsByConfiguration(configuration_id);
+        const pending_optitrack_streams = stream_service.getPendingStreamsByConfiguration(configuration_id)
+
+        optitrack_streams.forEach(ot => ot.source.status = "SUCCESS");
+        pending_optitrack_streams.forEach(ot => stream_service.onStreamSourceCreated(ot.id))
+
+        console.log(`\x1b[32mAll OptiTrack streams on ${node.machine_alias} enabled!\x1b[0m\n`);
         InterfacesNamespace.emitConfigUpdate();
     }
 
-    const onOptitrackStreamTargetRemoved = function (stream_id: string) {
-        const stream = stream_service.onStreamSourceDeleted(stream_id);
-        console.log(`\x1b[4m\x1b[32mOptiTrack stream target removed from ${node.machine_alias}!\x1b[0m`);
-        console.log(inspect(stream, false, null, true));
-        console.log();
+    const onOptitrackStreamingDisabled = function (configuration_id: string) {
+        const configuration = node.getConfiguration(configuration_id);
+        configuration.settings.is_streaming_enabled = false;
+
+        const optitrack_streams = stream_service.getStreamsByConfiguration(configuration_id);
+        const pending_optitrack_streams = stream_service.getPendingStreamsByConfiguration(configuration_id)
+
+        optitrack_streams.forEach(ot => {
+            ot.source.status = "OFFLINE";
+            ot.source.error = "OptiTrack streams have been disabled"
+        });
+        pending_optitrack_streams.forEach(ot => stream_service.onStreamSourceDeleted(ot.id))
+
+        console.log(`\x1b[32mAll OptiTrack streams on ${node.machine_alias} disabled!\x1b[0m\n`);
         InterfacesNamespace.emitConfigUpdate();
     }
 
-    const onOptitrackStreamTargetError = function (stream_id: string) {
-        const stream = stream_service.onStreamSourceError(stream_id);
-        console.log(`\x1b[4m\x1b[32m$Error on OptiTrack stream target update to ${node.machine_alias}!\x1b[0m`);
-        console.log(`${stream}\n`);
+    const onOptitrackStreamingError = function (configuration_id: string, error_message: string) {
+        const configuration = node.getConfiguration(configuration_id);
+        configuration.settings.is_streaming_enabled = false;
+
+        const optitrack_streams = stream_service.getStreamsByConfiguration(configuration_id);
+        const pending_optitrack_streams = stream_service.getPendingStreamsByConfiguration(configuration_id)
+
+        optitrack_streams.forEach(ot => {
+            ot.source.status = "ERROR";
+            ot.source.error = error_message
+        });
+        pending_optitrack_streams.forEach(ot => stream_service.onStreamSourceError(ot.id, error_message))
+
+        console.log(`\x1b[32mError while updating Optitrack streams on ${node.machine_alias}!\x1b[0m\n`);
         InterfacesNamespace.emitConfigUpdate();
     }
 
@@ -82,7 +114,7 @@ export default (node: Node, node_service: NodesService, stream_service: StreamsS
     node.socket.on(`${OptitrackServiceID}:initialized`, onOptitrackInitialized);
     node.socket.on(`${OptitrackServiceID}:heartbeat`, onOptitrackHeartBeat);
     node.socket.on(`${OptitrackServiceID}:terminated`, onOptitrackTerminated);
-    node.socket.on(`${OptitrackServiceID}:stream-target-added`, onOptitrackStreamTargetAdded);
-    node.socket.on(`${OptitrackServiceID}:stream-target-removed`, onOptitrackStreamTargetRemoved);
-    node.socket.on(`${OptitrackServiceID}:stream-target-error`, onOptitrackStreamTargetError);
+    node.socket.on(`${OptitrackServiceID}:streaming-enabled`, onOptitrackStreamingEnabled);
+    node.socket.on(`${OptitrackServiceID}:streaming-disabled`, onOptitrackStreamingDisabled);
+    node.socket.on(`${OptitrackServiceID}:streaming-error`, onOptitrackStreamingError);
 };

@@ -2,9 +2,12 @@ export class UnrealEngineSettings {
   udp_unicast_endpoint: UDPUnicastEndpoint;
   livelink: LiveLinkConfiguration;
 
-  constructor(udp_unicast_endpoint: UDPUnicastEndpoint, livelink: LiveLinkConfiguration) {
-    this.udp_unicast_endpoint = udp_unicast_endpoint;
-    this.livelink = livelink
+  constructor(udp_unicast_endpoint?: UDPUnicastEndpoint, livelink?: LiveLinkConfiguration) {
+    this.udp_unicast_endpoint = udp_unicast_endpoint ? udp_unicast_endpoint : {
+      "url": "127.0.0.1",
+      "port": 8000
+    }
+    this.livelink = livelink ? livelink : { sources: [] }
   }
 
   static serialize(settings: UnrealEngineSettings) {

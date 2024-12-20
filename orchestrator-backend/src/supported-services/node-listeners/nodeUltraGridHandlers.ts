@@ -7,7 +7,6 @@ import { NodesService } from "../../core/services/NodesService";
 import { StreamsService } from "../../core/services/StreamsService";
 import { onReceiveHeartBeatResponse } from "../../core/services/HeartbeatService";
 import { Stream } from "../../core/models/Stream";
-import { resolveCreateStreamSource, resolveCreateStreamTarget } from "../services/resolveServiceOperation";
 
 const ULTRAGRID_SEND_SERVICE_ID: XRITServiceID = "ULTRAGRID_SEND"
 const ULTRAGRID_RECEIVE_SERVICE_ID: XRITServiceID = "ULTRAGRID_RECEIVE"
@@ -33,7 +32,7 @@ export default (node: Node, node_service: NodesService, stream_service: StreamsS
 
         pending_ug_send_streams.forEach(s => {
             const target_node = node_service.getNode(s.target.node_id);
-            resolveCreateStreamSource(s, node, target_node);
+            stream_service.resolveCreateStreamSource(s, node, target_node);
         });
 
 
@@ -58,7 +57,7 @@ export default (node: Node, node_service: NodesService, stream_service: StreamsS
 
         pending_ug_receive_streams.forEach(s => {
             const source_node = node_service.getNode(s.source.node_id)
-            resolveCreateStreamTarget(s, source_node, node);
+            stream_service.resolveCreateStreamTarget(s, source_node, node);
         });
 
         InterfacesNamespace.emitConfigUpdate();

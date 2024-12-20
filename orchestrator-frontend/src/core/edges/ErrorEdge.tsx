@@ -10,6 +10,7 @@ import {
 } from "@xyflow/react";
 import { nextTick } from "process";
 import { useEffect } from "react";
+import { IEdgeData } from "./diagram";
 
 export type ErrorEdge = Edge<IEdgeData>;
 

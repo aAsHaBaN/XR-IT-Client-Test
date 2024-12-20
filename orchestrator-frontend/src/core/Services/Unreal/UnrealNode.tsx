@@ -1,17 +1,12 @@
 import { Node, NodeProps } from "@xyflow/react";
 import "./style.css";
 import { IServiceNodeData } from "@/types/diagram";
-import { formatServiceName } from "../utils";
-import Alert from "@/components/Alert";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { formatServiceName, getServiceStatusClass } from "../utils";
 import NodeError from "@/components/NodeError";
 
 export type UnrealNode = Node<IServiceNodeData>;
 
 export function UnrealNode({ data }: { data: IServiceNodeData }) {
-  const [showErrors, setShowErrors] = useState(false);
-
   return (
     <div
       className={`custom-node unreal-node ${
@@ -23,7 +18,9 @@ export function UnrealNode({ data }: { data: IServiceNodeData }) {
           {formatServiceName(data.label)}
           {data.isOnline && (
             <span
-              className={`status absolute top-1.5 ml-2 ${data.status === "SUCCESS" ? "status--running" : "status--stopped"}`}
+              className={`status absolute top-1.5 ml-2 ${getServiceStatusClass(
+                data.status,
+              )}`}
             ></span>
           )}
         </h3>

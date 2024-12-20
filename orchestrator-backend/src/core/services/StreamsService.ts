@@ -1,4 +1,7 @@
-import { resolveCreateStreamSource, resolveCreateStreamTarget, resolveRemoveStreamSource, resolveRemoveStreamTarget } from "../../supported-services/services/resolveServiceOperation";
+import { UltraGridSend, UltraGridReceive } from "../../supported-services/models/UltraGrid";
+import { addMVNStreamTarget, removeMVNStreamTarget } from "../../supported-services/services/MVNService";
+import { addUltraGridSendStreamTarget, addUltraGridReceiveStreamSource, removeUltraGridSendStreamTarget, removeUltraGridReceiveStreamSource } from "../../supported-services/services/UltraGridService";
+import { addUnrealEngineStreamSource, removeUnrealEngineStreamSource } from "../../supported-services/services/UnrealEngineService";
 import { Node } from "../models/Node";
 import { Stream, StreamSource, StreamTarget } from "../models/Stream";
 import { SocketException } from "../utils/SocketException";
@@ -30,8 +33,12 @@ export class StreamsService {
         return this.streams.filter(s => s.source.node_id === node_id || s.target.node_id === node_id);
     }
 
-    getPendingStreamsByConfiguration(configuration_id: string) {
+    getStreamsByConfiguration(configuration_id: string) {
         return this.streams.filter(s => s.source.node_id === configuration_id || s.target.node_id === configuration_id);
+    }
+
+    getPendingStreamsByConfiguration(configuration_id: string) {
+        return this.pending_streams.filter(s => s.source.node_id === configuration_id || s.target.node_id === configuration_id);
     }
 
     getPendingStreamsByNode(node_id: string) {
@@ -47,8 +54,8 @@ export class StreamsService {
         stream.source.status = stream.target.status = "PENDING";
         this.pending_streams.push(stream);
 
-        resolveCreateStreamSource(stream, source_node, target_node);
-        resolveCreateStreamTarget(stream, source_node, target_node);
+        this.resolveCreateStreamSource(stream, source_node, target_node);
+        this.resolveCreateStreamTarget(stream, source_node, target_node);
     }
 
     removeStream(stream: Stream, source_node: Node, target_node: Node) {
@@ -56,8 +63,8 @@ export class StreamsService {
             throw new SocketException(`Not all nodes for ${stream} are online.`)
 
         this.setStreamAsPending(stream.id, "BOTH", "PENDING_DELETE");
-        resolveRemoveStreamSource(stream, source_node, target_node);
-        resolveRemoveStreamTarget(stream, source_node, target_node);
+        this.resolveRemoveStreamSource(stream, source_node, target_node);
+        this.resolveRemoveStreamTarget(stream, source_node, target_node);
     }
 
     onStreamSourceCreated(stream_id: string) {
@@ -89,9 +96,10 @@ export class StreamsService {
         return pending_stream;
     }
 
-    onStreamSourceError(stream_id: string) {
+    onStreamSourceError(stream_id: string, error_message?: string) {
         const pending_stream = this.getPendingStream(stream_id)
         pending_stream.source.status = "ERROR";
+        pending_stream.source.error = error_message
 
         if (pending_stream.target.status != "PENDING" && pending_stream.target.status != "PENDING_DELETE") {
             this.pending_streams = this.pending_streams.filter((c) => c.id != stream_id);
@@ -218,5 +226,88 @@ export class StreamsService {
             }
         })
     }
+
+    resolveCreateStreamSource(stream: Stream, source_node: Node, target_node: Node) {
+        const source_configuration = StreamsService.getStreamConfiguration(source_node, stream.source);
+
+        switch (source_configuration.software_id) {
+            case "MVN":
+                addMVNStreamTarget(source_node, target_node, stream);
+                break;
+            case "OPTITRACK":
+                this.onStreamSourceCreated(stream.id);
+                break;
+            case "ULTRAGRID_SEND":
+                addUltraGridSendStreamTarget(source_node, stream, target_node.local_ip, source_configuration.settings as UltraGridSend);
+                break;
+            default:
+                throw new SocketException(`Create is not a valid stream source operation for ${source_configuration.software_id}.`);
+        }
+    }
+
+    resolveCreateStreamTarget(stream: Stream, source_node: Node, target_node: Node) {
+        const target_configuration = StreamsService.getStreamConfiguration(target_node, stream.target);
+
+        // Resolving service-specific operations for the target node in the stream
+        switch (target_configuration.software_id) {
+            case "UNREAL_ENGINE":
+                addUnrealEngineStreamSource(source_node, target_node!, stream);
+                break;
+            case "ULTRAGRID_RECEIVE":
+                addUltraGridReceiveStreamSource(target_node, stream, source_node.local_ip, target_configuration.settings as UltraGridReceive);
+                break;
+            default:
+                throw new SocketException(`Create is not a valid stream target operation for ${target_configuration.software_id}.`);
+        }
+    }
+
+    resolveRemoveStreamSource(stream: Stream, source_node: Node, target_node: Node) {
+        const source_configuration = StreamsService.getStreamConfiguration(source_node, stream.source);
+
+        // We need to check if the stream source has already been deleted.
+        // This would occur in the case where deletion failed previously and the user is trying again.
+        if (stream.source.status != "DELETED") {
+            // Resolving service-specific operations for the source node in the stream
+            switch (source_configuration.software_id) {
+                case "MVN":
+                    removeMVNStreamTarget(source_node, target_node, stream);
+                    break;
+                case "OPTITRACK":
+                    this.onStreamSourceDeleted(stream.id);
+                    break;
+                case "ULTRAGRID_SEND":
+                    removeUltraGridSendStreamTarget(source_node, stream, target_node.local_ip);
+                    break;
+                default:
+                    throw new SocketException(`Delete is not a valid stream source operation for ${source_configuration.software_id}.`);
+            }
+        }
+    }
+
+    resolveRemoveStreamTarget(stream: Stream, source_node: Node, target_node: Node) {
+        const target_configuration = StreamsService.getStreamConfiguration(target_node, stream.target);
+
+        // As above, we need to check if the stream target has already been deleted.
+        if (stream.target.status != "DELETED") {
+            // Resolving service-specific operations for the target node in the stream
+            switch (target_configuration.software_id) {
+                case "UNREAL_ENGINE":
+                    removeUnrealEngineStreamSource(target_node, stream);
+                    break;
+                case "ULTRAGRID_RECEIVE":
+                    removeUltraGridReceiveStreamSource(target_node, stream, source_node.local_ip);
+                    break;
+                default:
+                    throw new SocketException(`Delete is not a valid stream target operation for ${target_configuration.software_id}.`);
+            }
+        }
+    }
+
+    static getStreamConfiguration(node: Node, stream_endpoint: StreamSource | StreamTarget) {
+        const configuration = node.configurations.find((c) => c.id === stream_endpoint.configuration_id);
+        if (!configuration) throw new SocketException(`You cannot edit this stream as ${stream_endpoint.configuration_id} is not registered with node '${node.machine_alias}' `);
+
+        return configuration;
+    };
 
 }

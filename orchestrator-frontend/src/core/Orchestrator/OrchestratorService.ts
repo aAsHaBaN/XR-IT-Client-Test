@@ -2,11 +2,11 @@ import { ORCHESTRATOR_NODE } from "./constants";
 import { Edge, Node } from "@xyflow/react";
 
 interface OrchestratorServiceInterface {
-  createNodes(name: string, id: string): [Node[], Edge[]];
+  createNodes(name: string, id: string, ip: string): [Node[], Edge[]];
 }
 
 const OrchestratorService: OrchestratorServiceInterface = {
-  createNodes(name: string, id: string): [Node[], Edge[]] {
+  createNodes(name: string, id: string, ip: string = ""): [Node[], Edge[]] {
     const edges: Edge[] = [];
     const nodes: Node[] = [];
 
@@ -18,6 +18,7 @@ const OrchestratorService: OrchestratorServiceInterface = {
         label: "XR-IT Orchestrator",
         configName: name,
         isOnline: true,
+        ip,
       },
       position: { x: 0, y: 0 },
       deletable: false,

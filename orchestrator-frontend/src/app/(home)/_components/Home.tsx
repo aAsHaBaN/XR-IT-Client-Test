@@ -7,6 +7,7 @@ import ImportConfig from "./ImportConfig";
 import LaunchConfig from "./LaunchConfig";
 import useSocket from "@/hooks/useSocket";
 import CreateConfig from "./CreateConfig";
+import Alert from "@/components/Alert";
 
 function Home({
   allConfigurations,
@@ -31,13 +32,22 @@ function Home({
     null,
   );
   const [configurations, setConfigurations] = useState<IConfiguration[]>([]);
+  const [errors, setErrors] = useState<string[] | null>([]);
 
   useEffect(() => {
-    emit("config:get-orchestrator-config");
-    listen("config:orchestrator-config", (config) => {
-      setCurrentConfig(config);
-    });
-  }, []);
+    if (isConnected) {
+      emit("config:get-orchestrator-config");
+      listen("config:orchestrator-config", (config) => {
+        setCurrentConfig(config);
+      });
+    }
+  }, [emit, listen, isConnected]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      setCurrentConfig(null);
+    }
+  }, [isConnected]);
 
   useEffect(() => {
     setConfigurations(
@@ -45,23 +55,56 @@ function Home({
     );
   }, [currentConfig, allConfigurations]);
 
+  function clearError(index: number) {
+    setErrors((prevErrors) => {
+      const newErrors = prevErrors?.filter((_, i) => i !== index);
+      return newErrors || [];
+    });
+  }
+
   async function onConfigurationSelection(configurationId: string) {
     try {
       const response = await handleConfigurationSelection(configurationId);
-      if ("status" in response && response.status === "error") {
-        alert(response.message);
+      if (!response) {
+        setErrors((prevErrors) => [
+          ...(prevErrors || []),
+          "Failed to launch configuration.",
+        ]);
         return;
       }
+      if ("status" in response && response.status === "error") {
+        setErrors((prevErrors) => [...(prevErrors || []), response.message]);
+        return;
+      }
+      setErrors(null);
       setCurrentConfig(response as IConfiguration);
       resetSocket();
     } catch (error) {
       console.error(error);
-      alert("Failed to launch configuration.");
+      setErrors((prevErrors) => [
+        ...(prevErrors || []),
+        "Failed to launch configuration.",
+      ]);
     }
   }
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-wrap items-stretch gap-4 p-4 pb-4 text-slate-700 xl:p-8">
+      {errors && (
+        <div className="w-full">
+          <div className="mx-auto flex max-w-lg flex-col gap-2">
+            {errors.map((error, index) => (
+              <Alert
+                key={error + index}
+                type="error"
+                onClose={() => clearError(index)}
+              >
+                {error}
+              </Alert>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="flex-1 xl:max-w-2xl xl:basis-full">
         <LaunchConfig
           configurations={configurations}

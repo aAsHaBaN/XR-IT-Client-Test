@@ -14,48 +14,60 @@ export default (node: Node, node_service: NodesService, stream_service: StreamsS
   const UE_SERVICE_ID: XRITServiceID = "UNREAL_ENGINE";
 
   const onUEInitialized = function (configuration_id: string, settings: UnrealEngineSettings) {
-    const index = node.configurations.findIndex((c: XRITServicesConfig) => c.id === configuration_id);
-    if (index == -1) throw new SocketException(`Unreal Engine is not registered with node '${node.id}'.`);
+    try {
+      const index = node.configurations.findIndex((c: XRITServicesConfig) => c.id === configuration_id);
+      if (index == -1) throw new SocketException(`Unreal Engine is not registered with node '${node.id}'.`);
 
-    const parsed_settings = new UnrealEngineSettings(settings.udp_unicast_endpoint, settings.livelink);
-    node.configurations[index]!.settings = parsed_settings;
-    node.configurations[index]!.status = "SUCCESS";
+      const parsed_settings = new UnrealEngineSettings(settings?.udp_unicast_endpoint, settings?.livelink);
+      node.configurations[index]!.settings = parsed_settings;
+      node.configurations[index]!.status = "SUCCESS";
 
-    console.log(`\x1b[1m\x1b[4m\x1b[32mUnreal Engine and all related LiveLink streams initialized on ${node.machine_alias}!\x1b[0m`);
-    console.log(inspect(parsed_settings, false, null, true));
-    console.log();
-
-    // Once we have set the configuration for Unreal Engine, we know that all streams have been created, as the Unreal Engine
-    // Settings object contains all streams.
-    const ue_streams = stream_service.streams.filter((s: Stream) => s.target.configuration_id === configuration_id);
-    ue_streams.forEach(s => {
-      stream_service.setStreamAsPending(s.id, "TARGET", "PENDING");
-    })
-
-    const pending_ue_streams = stream_service.pending_streams.filter((s: Stream) => s.target.configuration_id === configuration_id);
-    pending_ue_streams.forEach(s => {
-      stream_service.onStreamTargetCreated(s.id)
-      console.log(inspect(s, false, null, true));
+      console.log(`\x1b[1m\x1b[4m\x1b[32mUnreal Engine and all related LiveLink streams initialized on ${node.machine_alias}!\x1b[0m`);
+      console.log(inspect(parsed_settings, false, null, true));
       console.log();
-    });
 
-    InterfacesNamespace.emitConfigUpdate();
+      // Once we have set the configuration for Unreal Engine, we know that all streams have been created, as the Unreal Engine
+      // Settings object contains all streams.
+      const ue_streams = stream_service.streams.filter((s: Stream) => s.target.configuration_id === configuration_id);
+      ue_streams.forEach(s => {
+        stream_service.setStreamAsPending(s.id, "TARGET", "PENDING");
+      })
+
+      const pending_ue_streams = stream_service.pending_streams.filter((s: Stream) => s.target.configuration_id === configuration_id);
+      pending_ue_streams.forEach(s => {
+        stream_service.onStreamTargetCreated(s.id)
+        console.log(inspect(s, false, null, true));
+        console.log();
+      });
+
+      InterfacesNamespace.emitConfigUpdate();
+    } catch (e) {
+      console.log(`ERROR: ${e}\n`)
+    }
   };
 
   const onUEHeartBeat = function (configuration_id: string, is_running: boolean) {
-    onReceiveHeartBeatResponse(node, node_service, stream_service, configuration_id, is_running);
-    InterfacesNamespace.emitConfigUpdate();
+    try {
+      onReceiveHeartBeatResponse(node, node_service, stream_service, configuration_id, is_running);
+      InterfacesNamespace.emitConfigUpdate();
+    } catch (e) {
+      console.log(`ERROR: ${e}\n`)
+    }
   };
 
   const onUETerminated = function (configuration_id: string) {
-    var configuration = node.configurations.find(c => c.id === configuration_id);
-    if (!configuration) throw new SocketException(`Received terminated message from configuration '${configuration_id}' but it is not registered on node ${node.id}`)
+    try {
+      var configuration = node.configurations.find(c => c.id === configuration_id);
+      if (!configuration) throw new SocketException(`Received terminated message from configuration '${configuration_id}' but it is not registered on node ${node.id}`)
 
-    configuration.status = "OFFLINE";
-    stream_service.setConfigurationStreamsAsOffline(configuration_id)
+      configuration.status = "OFFLINE";
+      stream_service.setConfigurationStreamsAsOffline(configuration_id)
 
-    console.log(`\x1b[31mUnreal Engine has terminated on'${node.machine_alias}'\x1b[0m`);
-    InterfacesNamespace.emitConfigUpdate();
+      console.log(`\x1b[31mUnreal Engine has terminated on'${node.machine_alias}'\x1b[0m`);
+      InterfacesNamespace.emitConfigUpdate();
+    } catch (e) {
+      console.log(`ERROR: ${e}\n`)
+    }
   }
 
   /* 
@@ -122,48 +134,60 @@ export default (node: Node, node_service: NodesService, stream_service: StreamsS
   };
 
   const onUEStreamSourceAdded = function (stream_id: string) {
-    const stream = stream_service.onStreamTargetCreated(stream_id);
-    markConfigurationSuccessful(stream.target.configuration_id);
+    try {
+      const stream = stream_service.onStreamTargetCreated(stream_id);
+      markConfigurationSuccessful(stream.target.configuration_id);
 
-    console.log(`\x1b[4m\x1b[32mUnreal Engine Live Link Source added to ${node.machine_alias}!\x1b[0m`);
-    console.log(inspect(stream, false, null, true));
-    console.log();
+      console.log(`\x1b[4m\x1b[32mUnreal Engine Live Link Source added to ${node.machine_alias}!\x1b[0m`);
+      console.log(inspect(stream, false, null, true));
+      console.log();
 
-    const ue_settings = node.getConfiguration(stream.target.configuration_id).settings;
-    console.log(`\x1b[4m\x1b[32mNew Unreal Engine settings on ${node.machine_alias}!\x1b[0m`);
-    console.log(inspect(ue_settings, false, null, true));
-    console.log();
+      const ue_settings = node.getConfiguration(stream.target.configuration_id).settings;
+      console.log(`\x1b[4m\x1b[32mNew Unreal Engine settings on ${node.machine_alias}!\x1b[0m`);
+      console.log(inspect(ue_settings, false, null, true));
+      console.log();
 
-    InterfacesNamespace.emitConfigUpdate();
+      InterfacesNamespace.emitConfigUpdate();
+    } catch (e) {
+      console.log(`ERROR: ${e}\n`)
+    }
   }
 
   const onUEStreamSourceRemoved = function (stream_id: string) {
-    const stream = stream_service.onStreamTargetDeleted(stream_id);
-    markConfigurationSuccessful(stream.target.configuration_id);
+    try {
+      const stream = stream_service.onStreamTargetDeleted(stream_id);
+      markConfigurationSuccessful(stream.target.configuration_id);
 
-    console.log(`\x1b[4m\x1b[32m$nreal Engine Live Link Source removed to ${node.machine_alias}!\x1b[0m`);
-    console.log(inspect(stream, false, null, true));
-    console.log();
+      console.log(`\x1b[4m\x1b[32m$nreal Engine Live Link Source removed to ${node.machine_alias}!\x1b[0m`);
+      console.log(inspect(stream, false, null, true));
+      console.log();
 
-    const ue_settings = node.getConfiguration(stream.target.configuration_id).settings;
-    console.log(`\x1b[4m\x1b[32mNew Unreal Engine settings on ${node.machine_alias}!\x1b[0m`);
-    console.log(inspect(ue_settings, false, null, true));
-    console.log();
+      const ue_settings = node.getConfiguration(stream.target.configuration_id).settings;
+      console.log(`\x1b[4m\x1b[32mNew Unreal Engine settings on ${node.machine_alias}!\x1b[0m`);
+      console.log(inspect(ue_settings, false, null, true));
+      console.log();
 
-    InterfacesNamespace.emitConfigUpdate();
+      InterfacesNamespace.emitConfigUpdate();
+    } catch (e) {
+      console.log(`ERROR: ${e}\n`)
+    }
   }
 
   const onUEStreamSourceError = function (stream_id: string) {
-    const stream = stream_service.onStreamTargetError(stream_id);
+    try {
+      const stream = stream_service.onStreamTargetError(stream_id);
 
-    const ue_config = node.configurations.find(c => c.id === stream.target.configuration_id);
-    if (!ue_config) throw new SocketException('Internal server error:no matching configuration exists on this machine.')
-    ue_config.status = "ERROR"
+      const ue_config = node.configurations.find(c => c.id === stream.target.configuration_id);
+      if (!ue_config) throw new SocketException('Internal server error:no matching configuration exists on this machine.')
+      ue_config.status = "ERROR"
 
-    console.log(`\x1b[4m\x1b[32m$Error on Unreal Engine Live Link Source update to ${node.machine_alias}!\x1b[0m`);
-    console.log(inspect(stream, false, null, true));
-    console.log();
-    InterfacesNamespace.emitConfigUpdate();
+      console.log(`\x1b[4m\x1b[32m$Error on Unreal Engine Live Link Source update to ${node.machine_alias}!\x1b[0m`);
+      console.log(inspect(stream, false, null, true));
+      console.log();
+      InterfacesNamespace.emitConfigUpdate();
+    } catch (e) {
+      console.log(`ERROR: ${e}\n`)
+    }
   }
 
   const markConfigurationSuccessful = function (config_id: string) {

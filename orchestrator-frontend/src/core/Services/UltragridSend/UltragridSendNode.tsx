@@ -2,7 +2,7 @@ import { Node, NodeProps } from "@xyflow/react";
 import "./style.css";
 import { IServiceNodeData } from "@/types/diagram";
 import NodeError from "@/components/NodeError";
-import { formatServiceName } from "../utils";
+import { formatServiceName, getServiceStatusClass } from "../utils";
 
 export type UltragridSendNode = Node<IServiceNodeData>;
 
@@ -18,7 +18,9 @@ export function UltragridSendNode({ data }: { data: IServiceNodeData }) {
           {formatServiceName(data.label)}
           {data.isOnline && (
             <span
-              className={`status absolute top-1.5 ml-2 ${data.status === "SUCCESS" ? "status--running" : "status--stopped"}`}
+              className={`status absolute top-1.5 ml-2 ${getServiceStatusClass(
+                data.status,
+              )}`}
             ></span>
           )}
         </h3>

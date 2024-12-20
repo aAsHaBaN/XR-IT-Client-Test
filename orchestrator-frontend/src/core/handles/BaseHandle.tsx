@@ -10,6 +10,7 @@ import { IHandle } from "./diagram";
 import { IServiceNodeData } from "@/types/diagram";
 import NodeError from "@/components/NodeError";
 import "./BaseHandle.css";
+import { getHandleStatusClass } from "./utils";
 
 function BaseHandle({ handle }: { handle: IHandle }) {
   const connections = useHandleConnections({
@@ -22,24 +23,6 @@ function BaseHandle({ handle }: { handle: IHandle }) {
   const isOnline = node && node.data.isOnline;
   const isConnectable = connections.length === 0 && handle.isConnectable;
 
-  function getHandleStatus() {
-    if (!isOnline) return "handle--offline";
-
-    switch (handle.status) {
-      case "SUCCESS":
-        return "handle--running";
-      case "ERROR":
-        return "handle--error";
-      case "OFFLINE":
-        return "handle--offline";
-      case "PENDING":
-      case "PENDING_DELETE":
-        return "handle--pending";
-      default:
-        return "handle--offline";
-    }
-  }
-
   return (
     <div className="base-handle">
       <Handle
@@ -47,7 +30,7 @@ function BaseHandle({ handle }: { handle: IHandle }) {
         position={handle.isInput ? Position.Left : Position.Right}
         id={handle.id}
         isConnectable={isConnectable}
-        className={getHandleStatus()}
+        className={getHandleStatusClass(isOnline ? handle.status : "OFFLINE")}
       ></Handle>
       <PlusIcon
         className={`base-handle__icon ${!isConnectable ? "opacity-0" : "opacity-100"}`}

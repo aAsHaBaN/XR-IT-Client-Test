@@ -5,12 +5,6 @@ const baseUrl = process.env.NEXT_PUBLIC_API_HOST ?? "http://localhost:8080";
 const apiUrl = `${baseUrl}/configurations`;
 
 async function HomePage() {
-  // Skip fetching during the build process
-  if (typeof window === "undefined") {
-    console.log("Skipping data fetching during build process");
-    return <div>Loading...</div>;
-  }
-
   let data;
   try {
     data = await fetch(apiUrl);
@@ -39,8 +33,15 @@ async function HomePage() {
         };
       }
       return response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      return {
+        status: "error",
+        message:
+          error.cause.code === "ECONNREFUSED"
+            ? "Failed to connect to the server."
+            : "An error occurred while launching the configuration.",
+      };
     }
   };
 
