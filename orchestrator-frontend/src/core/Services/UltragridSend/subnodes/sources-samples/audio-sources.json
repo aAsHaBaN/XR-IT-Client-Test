@@ -1,0 +1,51 @@
+{
+  "PC Internal Audio": [
+    { "label": "PC Internal Audio", "value": "PC Internal Audio" }
+  ],
+  "PC Jack Input": [
+    {
+      "label": "PC Jack Input",
+      "value": "PC Jack Input"
+    }
+  ],
+  "NDI": [
+    {
+      "label": "Webcam 3 (NDI Webcam Audio)",
+      "value": "Webcam 3 (NDI Webcam Audio)"
+    },
+    {
+      "label": "PTZ Camera 1 (Audio)",
+      "value": "PTZ Camera 1 (Audio)"
+    }
+  ],
+  "Sound Cards": [
+    {
+      "label": "Focusrite 8i8 USB Audio 1 +2",
+      "value": "Focusrite 8i8 USB Audio 1 +2"
+    },
+    {
+      "label": "MOTU USB Audio 2 + 2",
+      "value": "MOTU USB Audio 2 + 2"
+    },
+    {
+      "label": "AESEBU Focusrite Audio 1",
+      "value": "AESEBU Focusrite Audio 1"
+    }
+  ],
+  "Test Signal": [
+    {
+      "label": "Test Signal 1 kHz",
+      "value": "Test Signal 1 kHz"
+    }
+  ],
+  "Other": [
+    {
+      "label": "WASAPI Audio Source",
+      "value": "WASAPI Audio Source"
+    },
+    {
+      "label": "Webcam V4K 1080p Audio",
+      "value": "Webcam V4K 1080p Audio"
+    }
+  ]
+}

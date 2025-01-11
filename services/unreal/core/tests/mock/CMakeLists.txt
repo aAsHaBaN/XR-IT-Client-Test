@@ -1,0 +1,8 @@
+add_executable(mock_xrit_node mock_xrit_node.cpp)
+target_link_libraries(mock_xrit_node websockets xrit_unreal simdjson)
+
+add_executable(mock_unreal_service mock_unreal_service.cpp)
+target_link_libraries(mock_unreal_service xrit_unreal simdjson)
+
+add_executable(generate_mock_data generate_mock_data.cpp)
+target_link_libraries(generate_mock_data xrit_unreal simdjson)

@@ -1,0 +1,5 @@
+[
+  { "label": "H264", "value": "H264" },
+  { "label": "H265 (HEVC)", "value": "H265 (HEVC)" },
+  { "label": "MJPEG", "value": "MJPEG" }
+]

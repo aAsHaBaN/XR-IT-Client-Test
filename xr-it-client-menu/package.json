@@ -1,0 +1,16 @@
+{
+  "pkg": {
+    "assets": [
+      "node_modules/chalk/source/**/*"
+    ],
+    "targets": [
+      "node14-win-x64",
+      "node14-linux-x64",
+      "node14-macos-x64"
+    ]
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "readline-sync": "^1.4.10"
+  }
+}

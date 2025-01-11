@@ -1,0 +1,27 @@
+@tailwind components;
+
+@layer components {
+  .ultragrid-send-node .custom-node__header {
+    @apply bg-ultragrid-send-primary;
+  }
+
+  .ultragrid-send-subnode {
+    @apply h-80 w-40;
+  }
+
+  .subnode.ultragrid-send-subnode {
+    @apply items-start bg-ultragrid-send-primary/50 py-4;
+  }
+
+  .subnode.ultragrid-send-subnode .subnode__content {
+    @apply w-full px-2;
+  }
+
+  .ultragrid-send-subnode__settings {
+    @apply flex w-full flex-col gap-2;
+  }
+
+  .subnode.ultragrid-send-subnode .subnode__label {
+    @apply w-full font-bold;
+  }
+}

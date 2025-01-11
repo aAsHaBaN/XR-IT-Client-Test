@@ -1,0 +1,15 @@
+@tailwind components;
+
+@layer components {
+  .metaquest-node .custom-node__header {
+    @apply bg-metaquest-primary;
+  }
+
+  .metaquest-subnode {
+    @apply h-8 w-36;
+  }
+
+  .subnode.metaquest-subnode {
+    @apply bg-metaquest-primary/50;
+  }
+}

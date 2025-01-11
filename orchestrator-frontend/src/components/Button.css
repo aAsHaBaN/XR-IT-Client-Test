@@ -1,0 +1,21 @@
+@tailwind components;
+
+.button {
+  @apply flex w-fit items-center gap-2 self-center rounded-md border border-transparent px-3 py-1 text-center text-white shadow-md transition-all hover:shadow-lg focus:shadow-none active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none;
+}
+
+.button--square {
+  @apply p-2;
+}
+
+.button--primary {
+  @apply bg-primary hover:bg-primary/80 focus:bg-primary/80 active:bg-primary/80;
+}
+
+.button--secondary {
+  @apply bg-secondary hover:bg-secondary/80 focus:bg-secondary/80 active:bg-secondary/80;
+}
+
+.button--green {
+  @apply bg-green-500 hover:bg-green-500/80 focus:bg-green-500/80 active:bg-green-500/80;
+}
