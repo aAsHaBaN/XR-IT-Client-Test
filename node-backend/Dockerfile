@@ -25,4 +25,4 @@ EXPOSE 2223
 #CMD ["npm", "run", "dev", "use_default=local", "config_id=6925669e-043e-4654-af79-d36c8518ee43"]
 #CMD ["npm", "run", "start:mocks:all"]
 #CMD ["npm", "run", "dev"]
-CMD ["npm", "run", "dev", "use_default=distributed"]
+CMD ["npm", "start", "use_default=distributed"]
